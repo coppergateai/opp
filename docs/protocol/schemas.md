@@ -29,4 +29,4 @@ Import from the package:
 import { loadProtocolManifest, loadProtocolSchema } from "@opp/schema";
 ```
 
-OpenAPI for the full hosted surface is **A-010** (not this ID).
+OpenAPI for the full hosted surface: [`hosted-api.md`](./hosted-api.md) (`GET /v1/openapi.json`, A-010).

@@ -90,10 +90,37 @@ export function loadProtocolSchema(
   ) as Record<string, unknown>;
 }
 
+/** Hosted HTTP API document version (URL prefix /v1). */
+export const OPP_HOSTED_API_VERSION = "1.0.0" as const;
+
+export type OpenApiDocument = {
+  openapi: string;
+  info: { title: string; version: string; description?: string };
+  paths: Record<string, unknown>;
+  components?: Record<string, unknown>;
+};
+
+/** Machine-readable OpenAPI 3.1 document for the hosted OPP service (A-010). */
+export function loadHostedOpenApi(): OpenApiDocument {
+  return readJson("openapi/opp-hosted-v1.openapi.json");
+}
+
 /**
- * Hosted paths that serve machine-readable schemas (P-010).
- * OpenAPI polish for the rest of the API is A-010.
+ * Paths documented in OpenAPI that the hosted service implements (A-010).
+ * Used by tests to keep docs and router aligned.
  */
+export const DOCUMENTED_HOSTED_PATHS = [
+  "/health",
+  "/ready",
+  "/v1/openapi.json",
+  "/v1/schemas",
+  "/v1/schemas/{schemaId}",
+  "/v1/programs/parse",
+  "/v1/spend/evaluate",
+  "/v1/receipts/verify",
+] as const;
+
+/** @deprecated Prefer DOCUMENTED_HOSTED_PATHS — kept for P-010 call sites. */
 export const DOCUMENTED_SCHEMA_PATHS = [
   "/v1/schemas",
   "/v1/schemas/{schemaId}",

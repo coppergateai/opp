@@ -10,7 +10,7 @@ Second external Coppergate factory product ([D16](../coppergate-architecture/doc
 | `@opp/schema` | Open ID / program / receipt types + JSON Schemas (`/v1/schemas`) |
 | `@opp/parse` | Markdown → program rows |
 | `@opp/verify` | Spend License + receipt verify |
-| `@opp/api` | HTTP parse / spend / verify |
+| `@opp/api` | HTTP parse / spend / verify + OpenAPI (`/v1/openapi.json`) |
 | `@opp/web` | Static landing ([opp.coppergate.ai](https://opp.coppergate.ai)) |
 
 ## Quickstart

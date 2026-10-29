@@ -1,5 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { DOCUMENTED_HOSTED_PATHS, OPP_HOSTED_API_VERSION } from "@opp/schema";
 import { createApiServer } from "./index.js";
 
 /** Coppergate Accept → OPP verify body (P-020). */
@@ -47,6 +48,77 @@ const MD = `| Status | ID | Title | Notes |
 `;
 
 describe("@opp/api", () => {
+  it("serves OpenAPI and polished errors/pagination (A-010)", async () => {
+    await withServer(async (port) => {
+      const base = `http://127.0.0.1:${port}`;
+      const openapi = await fetch(`${base}/v1/openapi.json`);
+      assert.equal(openapi.status, 200);
+      const doc = (await openapi.json()) as {
+        openapi: string;
+        info: { version: string; description?: string };
+        paths: Record<string, unknown>;
+      };
+      assert.equal(doc.openapi, "3.1.0");
+      assert.equal(doc.info.version, OPP_HOSTED_API_VERSION);
+      assert.match(String(doc.info.description ?? ""), /\$0/);
+      for (const p of DOCUMENTED_HOSTED_PATHS) {
+        assert.ok(p in doc.paths, p);
+      }
+
+      const badJson = await fetch(`${base}/v1/programs/parse`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{",
+      });
+      assert.equal(badJson.status, 400);
+      const badBody = (await badJson.json()) as {
+        error: string;
+        message: string;
+      };
+      assert.equal(badBody.error, "invalid_json");
+      assert.ok(badBody.message.length > 0);
+
+      const missing = await fetch(`${base}/v1/schemas/unknown-id`);
+      assert.equal(missing.status, 404);
+      const missingBody = (await missing.json()) as { error: string; message: string };
+      assert.equal(missingBody.error, "schema_not_found");
+      assert.ok(missingBody.message.includes("unknown-id"));
+
+      const multi = `| Status | ID | Title | Notes |
+| --- | --- | --- | --- |
+| Open | A-010 | one | a |
+| Open | P-020 | two | b |
+| Done | W-001 | three | c |
+`;
+      const paged = await fetch(`${base}/v1/programs/parse`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ markdown: multi, limit: 1, offset: 1 }),
+      });
+      assert.equal(paged.status, 200);
+      const pageBody = (await paged.json()) as {
+        rows: { id: string }[];
+        summary: { openCount: number; doneCount: number };
+        page: {
+          offset: number;
+          limit: number;
+          total: number;
+          hasMore: boolean;
+        };
+      };
+      assert.equal(pageBody.rows.length, 1);
+      assert.equal(pageBody.rows[0]?.id, "P-020");
+      assert.equal(pageBody.summary.openCount, 2);
+      assert.equal(pageBody.summary.doneCount, 1);
+      assert.deepEqual(pageBody.page, {
+        offset: 1,
+        limit: 1,
+        total: 3,
+        hasMore: true,
+      });
+    });
+  });
+
   it("Coppergate Accept receipt verifies over HTTP (P-020)", async () => {
     await withServer(async (port) => {
       const base = `http://127.0.0.1:${port}`;

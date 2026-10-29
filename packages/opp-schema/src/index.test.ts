@@ -1,11 +1,14 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
+  DOCUMENTED_HOSTED_PATHS,
   DOCUMENTED_SCHEMA_PATHS,
   isOpenId,
+  loadHostedOpenApi,
   loadProtocolManifest,
   loadProtocolSchema,
   normalizeOpenId,
+  OPP_HOSTED_API_VERSION,
   OPP_PROTOCOL_VERSION,
 } from "./index.js";
 
@@ -44,5 +47,16 @@ describe("@opp/schema", () => {
       "/v1/schemas",
       "/v1/schemas/{schemaId}",
     ]);
+  });
+
+  it("loads OpenAPI aligned to DOCUMENTED_HOSTED_PATHS (A-010)", () => {
+    const doc = loadHostedOpenApi();
+    assert.equal(doc.openapi, "3.1.0");
+    assert.equal(doc.info.version, OPP_HOSTED_API_VERSION);
+    assert.match(String(doc.info.description ?? ""), /Community \/ self-host \$0/);
+    assert.doesNotMatch(String(doc.info.description ?? ""), /\$99|\$199/);
+    for (const path of DOCUMENTED_HOSTED_PATHS) {
+      assert.ok(path in doc.paths, `missing OpenAPI path ${path}`);
+    }
   });
 });

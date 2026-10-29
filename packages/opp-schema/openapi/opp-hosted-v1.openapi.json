@@ -1,0 +1,374 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OPP Hosted API",
+    "version": "1.0.0",
+    "description": "HTTP API for Open Program Protocol: parse programs, evaluate Spend License, verify Ship Receipts. Portable protocol JSON Schemas live under `/v1/schemas`. Community / self-host $0 only — no paid SKU."
+  },
+  "servers": [
+    { "url": "http://127.0.0.1:8790", "description": "Local API (`pnpm --filter @opp/api dev`)" }
+  ],
+  "tags": [
+    { "name": "meta", "description": "Health and machine-readable docs" },
+    { "name": "programs", "description": "Open Program parse" },
+    { "name": "spend", "description": "Spend License evaluate" },
+    { "name": "receipts", "description": "Ship Receipt verify" }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["meta"],
+        "operationId": "getHealth",
+        "summary": "Liveness probe",
+        "responses": {
+          "200": {
+            "description": "Service is up",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Health" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "tags": ["meta"],
+        "operationId": "getReady",
+        "summary": "Readiness probe",
+        "responses": {
+          "200": {
+            "description": "Service is ready",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Health" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/openapi.json": {
+      "get": {
+        "tags": ["meta"],
+        "operationId": "getOpenApi",
+        "summary": "OpenAPI document for this hosted API",
+        "responses": {
+          "200": {
+            "description": "OpenAPI 3.1 JSON",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/schemas": {
+      "get": {
+        "tags": ["meta"],
+        "operationId": "listProtocolSchemas",
+        "summary": "Manifest of portable protocol JSON Schemas",
+        "responses": {
+          "200": {
+            "description": "Schema manifest",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProtocolSchemaManifest" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/schemas/{schemaId}": {
+      "get": {
+        "tags": ["meta"],
+        "operationId": "getProtocolSchema",
+        "summary": "Fetch one portable protocol JSON Schema",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["open-program", "ship-receipt"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON Schema document",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown schema id",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/programs/parse": {
+      "post": {
+        "tags": ["programs"],
+        "operationId": "parseOpenProgram",
+        "summary": "Parse Open Program markdown into rows",
+        "description": "Optional `limit` / `offset` paginate the returned `rows` array (summary always reflects the full parse).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ParseProgramRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Parsed rows (+ optional page slice)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ParseProgramResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body or JSON",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/spend/evaluate": {
+      "post": {
+        "tags": ["spend"],
+        "operationId": "evaluateSpendLicense",
+        "summary": "Evaluate Spend License for an Open ID",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SpendEvaluateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Spend allowed",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SpendEvaluateResponse" }
+              }
+            }
+          },
+          "403": {
+            "description": "Spend denied (invent-without-program, not open, …)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SpendEvaluateResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/receipts/verify": {
+      "post": {
+        "tags": ["receipts"],
+        "operationId": "verifyShipReceipt",
+        "summary": "Verify a Ship Receipt against a bound program",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/VerifyReceiptRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Receipt verified",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VerifyReceiptResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Receipt failed verification",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VerifyReceiptResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "required": ["ok", "protocolVersion", "product"],
+        "properties": {
+          "ok": { "type": "boolean" },
+          "protocolVersion": { "type": "string" },
+          "product": { "type": "string", "const": "opp" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error", "message"],
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Stable machine-readable error code"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable explanation"
+          },
+          "details": {
+            "description": "Optional structured context"
+          }
+        }
+      },
+      "ProtocolSchemaManifest": {
+        "type": "object",
+        "required": ["protocolVersion", "title", "description", "schemas"],
+        "properties": {
+          "protocolVersion": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "schemas": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "file", "summary"],
+              "properties": {
+                "id": { "type": "string" },
+                "file": { "type": "string" },
+                "summary": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "Page": {
+        "type": "object",
+        "required": ["offset", "limit", "total", "hasMore"],
+        "properties": {
+          "offset": { "type": "integer", "minimum": 0 },
+          "limit": { "type": "integer", "minimum": 1 },
+          "total": { "type": "integer", "minimum": 0 },
+          "hasMore": { "type": "boolean" }
+        }
+      },
+      "ParseProgramRequest": {
+        "type": "object",
+        "required": ["markdown"],
+        "properties": {
+          "markdown": { "type": "string", "minLength": 1 },
+          "programId": { "type": "string" },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "description": "Max rows to return (pagination). Omit for all rows."
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0,
+            "description": "Row offset when `limit` is set."
+          }
+        }
+      },
+      "ParseProgramResponse": {
+        "type": "object",
+        "required": ["protocolVersion", "programId", "rows", "summary"],
+        "properties": {
+          "protocolVersion": { "type": "string" },
+          "programId": { "type": "string" },
+          "rows": { "type": "array", "items": { "type": "object" } },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "openCount": { "type": "integer" },
+              "doneCount": { "type": "integer" },
+              "openIds": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "page": { "$ref": "#/components/schemas/Page" }
+        }
+      },
+      "SpendEvaluateRequest": {
+        "type": "object",
+        "required": ["markdown"],
+        "properties": {
+          "markdown": { "type": "string", "minLength": 1 },
+          "openId": {
+            "oneOf": [{ "type": "string" }, { "type": "null" }]
+          }
+        }
+      },
+      "SpendEvaluateResponse": {
+        "type": "object",
+        "required": ["decision"],
+        "properties": {
+          "decision": { "type": "object" }
+        }
+      },
+      "VerifyReceiptRequest": {
+        "type": "object",
+        "required": ["markdown", "receipt"],
+        "properties": {
+          "markdown": { "type": "string", "minLength": 1 },
+          "receipt": { "type": "object" }
+        }
+      },
+      "VerifyReceiptResponse": {
+        "type": "object",
+        "required": ["result"],
+        "properties": {
+          "result": { "type": "object" }
+        }
+      }
+    }
+  }
+}
