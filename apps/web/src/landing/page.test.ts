@@ -32,4 +32,34 @@ describe("OPP landing", () => {
     assert.match(html, /api\.opp\.coppergate\.ai\/health/);
     assert.match(html, /OPP_API_URL/);
   });
+
+  it("renders principles, scenario, how-it-works, walkthrough, architecture", () => {
+    const html = renderLandingPage();
+    assert.match(html, /id="principles"/);
+    assert.match(html, /Open ID ≠ freestyle invent/);
+    assert.match(html, /Spend License ≠ unlimited reserve/);
+    assert.match(html, /Ship Receipt ≠ chat transcript/);
+    assert.match(html, /id="scenario"/);
+    assert.match(html, /invent_without_program/);
+    assert.match(html, /openId: null → deny/);
+    assert.match(html, /id="how-it-works"/);
+    assert.match(html, /Spend License/);
+    assert.match(html, /Factory Accept/);
+    assert.match(html, /badge-available/);
+    assert.match(html, /id="walkthrough"/);
+    assert.match(html, /wedge-data/);
+    assert.match(html, /Invent without Open ID/);
+    assert.match(html, /id="architecture"/);
+    assert.match(html, /You are here/);
+    assert.match(html, /Protocol architecture/);
+  });
+
+  it("footer has protocol, developers, and ecosystem columns", () => {
+    const html = renderLandingPage();
+    assert.match(html, /footer-col/);
+    assert.match(html, />Protocol</);
+    assert.match(html, />Developers</);
+    assert.match(html, />Ecosystem</);
+    assert.match(html, /acpp\.coppergate\.ai/);
+  });
 });

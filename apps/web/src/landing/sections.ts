@@ -4,8 +4,12 @@ import {
   COPPERGATE_URL,
   DOCS,
   GITHUB_REPO,
+  PRINCIPLES,
+  PROTOCOL_LAYERS,
+  SCENARIO,
   SDK_SAMPLE,
   STACK,
+  WALKTHROUGH_STEPS,
   WEDGE_STEPS,
 } from "./constants.js";
 import { renderWordmark } from "./mark.js";
@@ -34,9 +38,11 @@ export function renderNav(): string {
   <div class="nav-inner">
     ${renderWordmark()}
     <ul class="nav-links" role="list">
-      <li><a href="#stack">Stack</a></li>
-      <li><a href="#wedge">Wedge</a></li>
+      <li><a href="#principles">Principles</a></li>
+      <li><a href="#scenario">Scenario</a></li>
+      <li><a href="#how-it-works">How it works</a></li>
       <li><a href="#developers">Developers</a></li>
+      <li><a href="#architecture">Architecture</a></li>
     </ul>
     <div class="nav-actions">
       <a class="btn btn-ghost" href="${escapeHtml(GITHUB_REPO)}" rel="noopener noreferrer">GitHub</a>
@@ -47,9 +53,13 @@ export function renderNav(): string {
     </div>
   </div>
   <div class="mobile-nav" id="mobile-nav" hidden>
-    <a href="#stack">Stack</a>
+    <a href="#principles">Principles</a>
+    <a href="#scenario">Scenario</a>
+    <a href="#how-it-works">How it works</a>
     <a href="#wedge">Wedge</a>
     <a href="#developers">Developers</a>
+    <a href="#walkthrough">Walkthrough</a>
+    <a href="#architecture">Architecture</a>
     <a href="${escapeHtml(DOCS.protocol)}">Docs</a>
     <a href="${escapeHtml(GITHUB_REPO)}" rel="noopener noreferrer">GitHub</a>
     <a class="btn btn-primary" href="${escapeHtml(DOCS.dogfood)}">Get started</a>
@@ -63,17 +73,17 @@ function heroVisual(): string {
   <div class="receipt-stage" role="img" aria-label="Open Program rows flowing into a verified Ship Receipt">
     <p class="stage-kicker">Open Program → Ship Receipt</p>
     <div class="program-rows">
-      <div class="program-row">
+      <div class="program-row" style="--row-i:0">
         <span class="id">P-030</span>
         <span class="title">@opp/client</span>
         <span class="status">Done</span>
       </div>
-      <div class="program-row">
+      <div class="program-row" style="--row-i:1">
         <span class="id">A-020</span>
         <span class="title">Hosted API</span>
         <span class="status">Done</span>
       </div>
-      <div class="program-row open">
+      <div class="program-row open" style="--row-i:2">
         <span class="id">P-040</span>
         <span class="title">Landing DX</span>
         <span class="status">Done</span>
@@ -103,10 +113,74 @@ export function renderHero(): string {
       <p class="lede">Portable Open Programs and Ship Receipts — agents invent only from Open IDs.</p>
       <div class="hero-ctas">
         <a class="btn btn-primary" href="${escapeHtml(DOCS.dogfood)}">Get started <span aria-hidden="true">→</span></a>
-        <a class="btn btn-secondary" href="#wedge">See the wedge</a>
+        <a class="btn btn-secondary" href="#scenario">See the scenario</a>
       </div>
     </div>
     ${heroVisual()}
+  </div>
+</section>`;
+}
+
+export function renderPrinciples(): string {
+  const cards = PRINCIPLES.map(
+    (p) => `
+    <article class="principle" data-reveal>
+      <h3>${escapeHtml(p.title)}</h3>
+      <p>${escapeHtml(p.body)}</p>
+      <div class="principle-diagram" aria-hidden="true">
+        <span>${escapeHtml(p.left)}</span><span class="x">≠</span><span>${escapeHtml(p.right)}</span>
+      </div>
+    </article>`,
+  ).join("");
+
+  return `
+<section class="section section-light" id="principles" aria-labelledby="principles-title">
+  <div class="container">
+    <p class="section-kicker">Contract principles</p>
+    <h2 id="principles-title">Only what’s on the program ships.</h2>
+    <p class="section-lead">Three separations that keep agent spend accountable.</p>
+    <div class="principles">${cards}</div>
+  </div>
+</section>`;
+}
+
+export function renderScenario(): string {
+  const beats = SCENARIO.beats
+    .map(
+      (beat, i) => `
+<li class="scenario-beat" data-reveal style="--beat-i:${i}">
+  <span class="scenario-beat-index" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
+  <div>
+    <p class="scenario-beat-who">${escapeHtml(beat.who)}</p>
+    <p class="scenario-beat-what">${escapeHtml(beat.what)}</p>
+  </div>
+</li>`,
+    )
+    .join("");
+
+  const { setting } = SCENARIO;
+
+  return `
+<section class="section" id="scenario" aria-labelledby="scenario-title">
+  <div class="container">
+    <p class="section-kicker">${escapeHtml(SCENARIO.kicker)}</p>
+    <h2 id="scenario-title">${escapeHtml(SCENARIO.title)}</h2>
+    <p class="section-lead">${escapeHtml(SCENARIO.lead)}</p>
+    <div class="scenario-layout">
+      <ol class="scenario-beats" role="list">${beats}</ol>
+      <aside class="scenario-stage" data-reveal aria-label="Scenario setup">
+        <p class="scenario-stage-label">${escapeHtml(setting.label)}</p>
+        <h3>${escapeHtml(setting.program)}</h3>
+        <dl class="scenario-facts">
+          <div><dt>Open ID</dt><dd class="mono">${escapeHtml(setting.openId)}</dd></div>
+          <div><dt>Invent</dt><dd class="mono">openId: null → deny</dd></div>
+          <div><dt>Spend</dt><dd class="mono">openId: P-030 → allow</dd></div>
+          <div><dt>Verify</dt><dd class="mono">receipt.ok: true</dd></div>
+        </dl>
+        <p class="scenario-outcome"><span class="dot" aria-hidden="true"></span>${escapeHtml(setting.outcome)}</p>
+        <a class="scenario-link" href="#walkthrough">See the protocol steps →</a>
+      </aside>
+    </div>
   </div>
 </section>`;
 }
@@ -136,6 +210,28 @@ export function renderStack(): string {
 </section>`;
 }
 
+export function renderHowItWorks(): string {
+  const layers = PROTOCOL_LAYERS.map(
+    (layer) => `
+<article class="layer" data-reveal id="layer-${escapeHtml(layer.id)}">
+  <p class="layer-num">${escapeHtml(layer.num)}</p>
+  <h3>${escapeHtml(layer.name)}</h3>
+  <p>${escapeHtml(layer.summary)}</p>
+  <span class="badge badge-${escapeHtml(layer.status)}">${escapeHtml(layer.statusLabel)}</span>
+</article>`,
+  ).join("");
+
+  return `
+<section class="section" id="how-it-works" aria-labelledby="how-title">
+  <div class="container">
+    <p class="section-kicker">How OPP works</p>
+    <h2 id="how-title">From Open Program to verified receipt.</h2>
+    <p class="section-lead">Parse, license, verify, and bind — status labels reflect what ships in this repository today.</p>
+    <div class="layers">${layers}</div>
+  </div>
+</section>`;
+}
+
 export function renderWedge(): string {
   const steps = WEDGE_STEPS.map(
     (s) => `
@@ -149,7 +245,7 @@ export function renderWedge(): string {
   ).join("");
 
   return `
-<section class="section" id="wedge" aria-labelledby="wedge-title">
+<section class="section section-light" id="wedge" aria-labelledby="wedge-title">
   <div class="container">
     <p class="section-kicker">Locked wedge</p>
     <h2 id="wedge-title">Program in. Receipt out.</h2>
@@ -196,6 +292,78 @@ export function renderDevelopers(): string {
 </section>`;
 }
 
+export function renderWalkthrough(): string {
+  const steps = WALKTHROUGH_STEPS.map(
+    (step, i) => `
+<button type="button" class="step-tab" role="tab" id="wedge-tab-${i}" aria-selected="${i === 0 ? "true" : "false"}" aria-controls="wedge-panel" data-step="${i}">
+  <span class="step-index">${String(i + 1).padStart(2, "0")}</span>
+  <span>
+    <strong>${escapeHtml(step.title)}</strong>
+    <span class="detail">${escapeHtml(step.detail)}</span>
+  </span>
+</button>`,
+  ).join("");
+
+  const first = WALKTHROUGH_STEPS[0]!;
+
+  return `
+<section class="section section-light" id="walkthrough" aria-labelledby="walkthrough-title">
+  <div class="container">
+    <p class="section-kicker">Protocol walkthrough</p>
+    <h2 id="walkthrough-title">From Open ID to verified receipt.</h2>
+    <p class="section-lead">Same locked wedge as API steps: author → bind → spend → verify → invent deny.</p>
+    <span class="demo-note">Demonstration sequence · mirrors docs/WEDGE.md</span>
+    <div class="example-grid">
+      <div role="tablist" aria-label="Wedge steps" class="timeline">${steps}</div>
+      <div class="walk-panel" id="wedge-panel" role="tabpanel" aria-labelledby="wedge-tab-0" data-reveal>
+        <h3 id="wedge-panel-title">${escapeHtml(first.title)}</h3>
+        <p id="wedge-panel-detail">${escapeHtml(first.detail)}</p>
+        <dl class="walk-meta">
+          <div><dt>Surface</dt><dd id="wedge-panel-meta" class="mono">${escapeHtml(first.meta)}</dd></div>
+          <div><dt>Client</dt><dd class="mono">@opp/client</dd></div>
+          <div><dt>API</dt><dd class="mono">api.opp.coppergate.ai</dd></div>
+        </dl>
+        <div class="walk-status"><span class="dot" aria-hidden="true"></span><span id="wedge-panel-status">Step ready</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+<script type="application/json" id="wedge-data">${JSON.stringify(WALKTHROUGH_STEPS).replace(/</g, "\\u003c")}</script>`;
+}
+
+export function renderArchitecture(): string {
+  return `
+<section class="section" id="architecture" aria-labelledby="arch-title">
+  <div class="container">
+    <p class="section-kicker">Protocol architecture</p>
+    <h2 id="arch-title">A contract layer, not another agent runtime.</h2>
+    <p class="section-lead">Identity stays in ACPP. Selection stays in Coppergate. OPP makes the program contract portable.</p>
+    <div class="arch" role="img" aria-label="Layered architecture: ACPP above OPP above Coppergate" data-reveal>
+      <div class="arch-layer arch-who">
+        <span class="arch-tag">Who</span>
+        <strong>ACPP — identity, grants, action receipts</strong>
+        <span>Verifiable agent identity before consequential spend</span>
+        <a href="${escapeHtml(ACPP_URL)}" rel="noopener noreferrer">Open ACPP →</a>
+      </div>
+      <div class="arch-arrow" aria-hidden="true">↓</div>
+      <div class="arch-layer arch-what">
+        <span class="arch-tag">What</span>
+        <strong>OPP — program contract + Ship Receipt verify</strong>
+        <span>@opp/parse · @opp/client · @opp/verify · Community API</span>
+        <span class="arch-here">You are here</span>
+      </div>
+      <div class="arch-arrow" aria-hidden="true">↓</div>
+      <div class="arch-layer arch-how">
+        <span class="arch-tag">How</span>
+        <strong>Coppergate — survivor selection / factory runtime</strong>
+        <span>Arena · Accept · OPP_API_URL verify path</span>
+        <a href="${escapeHtml(COPPERGATE_URL)}" rel="noopener noreferrer">Open Coppergate →</a>
+      </div>
+    </div>
+  </div>
+</section>`;
+}
+
 export function renderFinalCta(): string {
   return `
 <section class="final" aria-labelledby="final-title">
@@ -211,20 +379,49 @@ export function renderFinalCta(): string {
 }
 
 export function renderFooter(): string {
+  const year = new Date().getFullYear();
   return `
 <footer class="site-footer">
-  <div class="footer-inner">
-    <p>OPP · Open Program Protocol · Community $0</p>
-    <div class="footer-links">
-      <a href="${escapeHtml(DOCS.product)}">PRODUCT.md</a>
-      <a href="${escapeHtml(DOCS.wedge)}">Wedge</a>
-      <a href="${escapeHtml(DOCS.client)}" rel="noopener noreferrer">@opp/client</a>
-      <a href="${escapeHtml(DOCS.openapi)}" rel="noopener noreferrer">OpenAPI</a>
-      <a href="${escapeHtml(API_URL)}" rel="noopener noreferrer">API</a>
-      <a href="${escapeHtml(ACPP_URL)}">ACPP</a>
-      <a href="${escapeHtml(COPPERGATE_URL)}">Coppergate</a>
-      <a href="${escapeHtml(DOCS.license)}">MIT</a>
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      ${renderWordmark({ size: 26 })}
+      <p>Open Program Protocol · Community / self-host $0 only.</p>
     </div>
+    <div class="footer-col">
+      <h4>Protocol</h4>
+      <ul>
+        <li><a href="#principles">Principles</a></li>
+        <li><a href="#scenario">Scenario</a></li>
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#wedge">Wedge</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="${escapeHtml(DOCS.product)}">PRODUCT.md</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Developers</h4>
+      <ul>
+        <li><a href="${escapeHtml(DOCS.dogfood)}">Get started</a></li>
+        <li><a href="${escapeHtml(DOCS.client)}" rel="noopener noreferrer">@opp/client</a></li>
+        <li><a href="${escapeHtml(DOCS.openapi)}" rel="noopener noreferrer">OpenAPI</a></li>
+        <li><a href="${escapeHtml(DOCS.acceptVerify)}" rel="noopener noreferrer">Accept → verify</a></li>
+        <li><a href="${escapeHtml(API_URL)}" rel="noopener noreferrer">API</a></li>
+        <li><a href="${escapeHtml(GITHUB_REPO)}" rel="noopener noreferrer">GitHub</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Ecosystem</h4>
+      <ul>
+        <li><a href="${escapeHtml(ACPP_URL)}">ACPP</a></li>
+        <li><a href="${escapeHtml(COPPERGATE_URL)}">Coppergate</a></li>
+        <li><a href="${escapeHtml(DOCS.coppergateOpp)}">Coppergate + OPP</a></li>
+        <li><a href="${escapeHtml(DOCS.license)}">MIT</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© ${year} Coppergate / OPP · Community $0</span>
+    <span><a href="${escapeHtml(DOCS.license)}">MIT License</a></span>
   </div>
 </footer>`;
 }

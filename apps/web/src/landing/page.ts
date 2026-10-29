@@ -2,12 +2,17 @@ import { SITE_META, SITE_URL } from "./constants.js";
 import { landingClientScript } from "./client.js";
 import { landingStyles } from "./styles.js";
 import {
+  renderArchitecture,
   renderDevelopers,
   renderFinalCta,
   renderFooter,
   renderHero,
+  renderHowItWorks,
   renderNav,
+  renderPrinciples,
+  renderScenario,
   renderStack,
+  renderWalkthrough,
   renderWedge,
 } from "./sections.js";
 import { escapeHtml } from "../escape.js";
@@ -45,9 +50,14 @@ export function renderLandingPage(): string {
   ${renderNav()}
   <main>
     ${renderHero()}
+    ${renderPrinciples()}
+    ${renderScenario()}
     ${renderStack()}
+    ${renderHowItWorks()}
     ${renderWedge()}
     ${renderDevelopers()}
+    ${renderWalkthrough()}
+    ${renderArchitecture()}
     ${renderFinalCta()}
   </main>
   ${renderFooter()}

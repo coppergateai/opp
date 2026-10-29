@@ -6,13 +6,38 @@ export function landingClientScript(): string {
   var mobile = document.getElementById("mobile-nav");
   var copyBtn = document.getElementById("copy-code");
   var raw = document.getElementById("sdk-sample-raw");
+  var wedgeDataEl = document.getElementById("wedge-data");
+  var wedgeSteps = [];
+  try {
+    wedgeSteps = JSON.parse(wedgeDataEl ? wedgeDataEl.textContent || "[]" : "[]");
+  } catch (e) {
+    wedgeSteps = [];
+  }
+
+  function headerTone() {
+    if (!header) return;
+    var probeY = Math.min(header.getBoundingClientRect().bottom + 8, window.innerHeight - 1);
+    var probeX = Math.min(Math.max(window.innerWidth / 2, 24), window.innerWidth - 24);
+    var el = document.elementFromPoint(probeX, probeY);
+    var light = false;
+    while (el && el !== document.documentElement) {
+      if (el.classList && el.classList.contains("section-light")) {
+        light = true;
+        break;
+      }
+      el = el.parentElement;
+    }
+    header.classList.toggle("on-light", light);
+  }
 
   function onScroll() {
     if (!header) return;
     if (window.scrollY > 8) header.classList.add("is-scrolled");
     else header.classList.remove("is-scrolled");
+    headerTone();
   }
   window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", headerTone, { passive: true });
   onScroll();
 
   if (toggle && mobile) {
@@ -42,6 +67,50 @@ export function landingClientScript(): string {
       }
     });
   }
+
+  var tabs = document.querySelectorAll(".step-tab");
+  var title = document.getElementById("wedge-panel-title");
+  var detail = document.getElementById("wedge-panel-detail");
+  var meta = document.getElementById("wedge-panel-meta");
+  var status = document.getElementById("wedge-panel-status");
+  var panel = document.getElementById("wedge-panel");
+
+  function selectStep(index) {
+    var step = wedgeSteps[index];
+    if (!step) return;
+    tabs.forEach(function (tab, i) {
+      tab.setAttribute("aria-selected", i === index ? "true" : "false");
+    });
+    if (title) title.textContent = step.title;
+    if (detail) detail.textContent = step.detail;
+    if (meta) meta.textContent = step.meta;
+    if (status) {
+      status.textContent = index === wedgeSteps.length - 1
+        ? "Invent denied — invent_without_program"
+        : "Demonstration step " + (index + 1) + " of " + wedgeSteps.length;
+    }
+    if (panel) panel.setAttribute("aria-labelledby", "wedge-tab-" + index);
+  }
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      selectStep(Number(tab.getAttribute("data-step") || "0"));
+    });
+    tab.addEventListener("keydown", function (ev) {
+      var i = Number(tab.getAttribute("data-step") || "0");
+      if (ev.key === "ArrowDown" || ev.key === "ArrowRight") {
+        ev.preventDefault();
+        var next = Math.min(i + 1, tabs.length - 1);
+        tabs[next].focus();
+        selectStep(next);
+      } else if (ev.key === "ArrowUp" || ev.key === "ArrowLeft") {
+        ev.preventDefault();
+        var prev = Math.max(i - 1, 0);
+        tabs[prev].focus();
+        selectStep(prev);
+      }
+    });
+  });
 
   var reveal = document.querySelectorAll("[data-reveal]");
   if ("IntersectionObserver" in window && reveal.length) {
