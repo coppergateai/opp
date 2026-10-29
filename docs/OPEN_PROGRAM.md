@@ -18,7 +18,7 @@ Turn on Community OPP verify in production Coppergate. Community **$0** only.
 
 | Status | ID | Title | Notes |
 | --- | --- | --- | --- |
-| Done | RT-040 | Prod `OPP_API_URL` on Coppergate host | Vercel + Fly worker → `api.opp.coppergate.ai`; [PR #203](https://github.com/coppergateai/coppergate/pull/203) |
+| Done | RT-040 | Prod `OPP_API_URL` on Coppergate host | Vercel + Fly worker → `api.opp.coppergate.ai`; merged [PR #203](https://github.com/coppergateai/coppergate/pull/203) |
 
 ## Phase 4 — Portability & production dogfood (complete)
 
