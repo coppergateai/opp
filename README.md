@@ -14,6 +14,8 @@ Second external Coppergate factory product ([D16](../coppergate-architecture/doc
 | `@opp/api` | HTTP parse / spend / verify + OpenAPI (`/v1/openapi.json`) |
 | `@opp/web` | Static landing ([opp.coppergate.ai](https://opp.coppergate.ai)) |
 
+**Live:** [opp.coppergate.ai](https://opp.coppergate.ai) · API [api.opp.coppergate.ai](https://api.opp.coppergate.ai) · [OpenAPI](https://api.opp.coppergate.ai/v1/openapi.json)
+
 ## Quickstart
 
 ```bash

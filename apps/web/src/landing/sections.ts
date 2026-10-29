@@ -1,5 +1,6 @@
 import {
   ACPP_URL,
+  API_URL,
   COPPERGATE_URL,
   DOCS,
   GITHUB_REPO,
@@ -14,7 +15,7 @@ function highlightTs(source: string): string {
   return escapeHtml(source)
     .replace(/(\/\/.*)/g, '<span class="cm">$1</span>')
     .replace(
-      /\b(import|from|const|await)\b/g,
+      /\b(import|from|const|await|new)\b/g,
       '<span class="kw">$1</span>',
     )
     .replace(
@@ -22,7 +23,7 @@ function highlightTs(source: string): string {
       '<span class="str">$1</span>',
     )
     .replace(
-      /\b(parseOpenProgramMarkdown|evaluateSpendLicense|verifyShipReceipt)\b/g,
+      /\b(OppClient|evaluateSpend|verifyReceipt|openApi)\b/g,
       '<span class="fn">$1</span>',
     );
 }
@@ -63,19 +64,19 @@ function heroVisual(): string {
     <p class="stage-kicker">Open Program → Ship Receipt</p>
     <div class="program-rows">
       <div class="program-row">
-        <span class="id">P-010</span>
-        <span class="title">Schema types</span>
+        <span class="id">P-030</span>
+        <span class="title">@opp/client</span>
+        <span class="status">Done</span>
+      </div>
+      <div class="program-row">
+        <span class="id">A-020</span>
+        <span class="title">Hosted API</span>
         <span class="status">Done</span>
       </div>
       <div class="program-row open">
-        <span class="id">P-020</span>
-        <span class="title">Verify receipt</span>
-        <span class="status">Open</span>
-      </div>
-      <div class="program-row">
-        <span class="id">A-010</span>
-        <span class="title">API polish</span>
-        <span class="status">Open</span>
+        <span class="id">P-040</span>
+        <span class="title">Landing DX</span>
+        <span class="status">Done</span>
       </div>
     </div>
     <div class="receipt-card-lite">
@@ -164,10 +165,16 @@ export function renderDevelopers(): string {
   <div class="container">
     <p class="section-kicker">Developers</p>
     <h2 id="dev-title">Parse. License. Verify.</h2>
-    <p class="section-lead">@opp/parse and @opp/verify — same grammar Coppergate already uses for Open Programs.</p>
+    <p class="section-lead">@opp/client against the Community API — same Open Program grammar Coppergate already spends.</p>
+    <p class="dx-links" data-reveal>
+      <a href="${escapeHtml(DOCS.openapi)}" rel="noopener noreferrer">OpenAPI</a>
+      <a href="${escapeHtml(DOCS.client)}" rel="noopener noreferrer">@opp/client</a>
+      <a href="${escapeHtml(API_URL)}" rel="noopener noreferrer">${escapeHtml(API_URL.replace("https://", ""))}</a>
+      <a href="${escapeHtml(DOCS.hostedApi)}" rel="noopener noreferrer">Hosted API docs</a>
+    </p>
     <div class="code-panel" data-reveal>
       <div class="code-toolbar">
-        <span>@opp/verify · wedge</span>
+        <span>@opp/client · hosted wedge</span>
         <button type="button" class="copy-btn" id="copy-code">Copy</button>
       </div>
       <pre id="sdk-sample-raw" hidden>${escapeHtml(SDK_SAMPLE)}</pre>
@@ -209,7 +216,9 @@ export function renderFooter(): string {
     <div class="footer-links">
       <a href="${escapeHtml(DOCS.product)}">PRODUCT.md</a>
       <a href="${escapeHtml(DOCS.wedge)}">Wedge</a>
-      <a href="${escapeHtml(DOCS.protocol)}">Protocol</a>
+      <a href="${escapeHtml(DOCS.client)}" rel="noopener noreferrer">@opp/client</a>
+      <a href="${escapeHtml(DOCS.openapi)}" rel="noopener noreferrer">OpenAPI</a>
+      <a href="${escapeHtml(API_URL)}" rel="noopener noreferrer">API</a>
       <a href="${escapeHtml(ACPP_URL)}">ACPP</a>
       <a href="${escapeHtml(COPPERGATE_URL)}">Coppergate</a>
       <a href="${escapeHtml(DOCS.license)}">MIT</a>

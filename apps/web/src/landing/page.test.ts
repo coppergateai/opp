@@ -11,8 +11,16 @@ describe("OPP landing", () => {
     assert.match(html, /Autonomy under contract/);
     assert.match(html, /Community \/ self-host \$0/);
     assert.doesNotMatch(html, /\$99|\$199|Starter|Pro plan/i);
-    assert.match(html, /@opp\/verify/);
+    assert.match(html, /@opp\/client/);
     assert.match(html, /invent_without_program/);
     assert.match(html, /opp\.coppergate\.ai/);
+  });
+
+  it("links OpenAPI and hosted API for DX (P-040)", () => {
+    const html = renderLandingPage();
+    assert.match(html, /https:\/\/api\.opp\.coppergate\.ai\/v1\/openapi\.json/);
+    assert.match(html, /docs\/protocol\/client\.md/);
+    assert.match(html, /api\.opp\.coppergate\.ai/);
+    assert.match(html, /OppClient/);
   });
 });

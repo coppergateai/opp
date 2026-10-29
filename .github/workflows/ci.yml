@@ -42,5 +42,8 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Coppergate runtime prove (AG-010)
+        run: pnpm prove:coppergate-runtime
+
       - name: Open Program assert
         run: pnpm assert:open-program

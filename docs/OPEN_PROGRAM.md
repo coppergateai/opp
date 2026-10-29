@@ -12,7 +12,7 @@ ARCHITECTURE_REPO=coppergateai/opp
 ARCHITECTURE_PATHS=docs/OPEN_PROGRAM.md
 ```
 
-## Phase 1 — Dogfood / DX (spend next)
+## Phase 1 — Dogfood / DX (complete)
 
 Close the wedge for external runtimes: first-party client, hosted Community API, CI prove, landing DX. Community **$0** only.
 
@@ -20,8 +20,8 @@ Close the wedge for external runtimes: first-party client, hosted Community API,
 | --- | --- | --- | --- |
 | Done | P-030 | First-party `@opp/client` SDK | health, parse, spend, verify, schemas, openapi |
 | Done | A-020 | Host Community API (Vercel serverless) | `api.opp.coppergate.ai`; $0 |
-| Open | AG-010 | CI runs coppergate-runtime prove | `pnpm prove:coppergate-runtime` in `check` |
-| Open | P-040 | Landing + docs link OpenAPI and `@opp/client` | DX surface on opp.coppergate.ai |
+| Done | AG-010 | CI runs coppergate-runtime prove | `pnpm prove:coppergate-runtime` in `check` |
+| Done | P-040 | Landing + docs link OpenAPI and `@opp/client` | DX surface on opp.coppergate.ai |
 
 ## Phase 0 — Scaffold (complete)
 

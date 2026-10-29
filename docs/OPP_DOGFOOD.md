@@ -9,11 +9,17 @@ ARCHITECTURE_PATHS=docs/OPEN_PROGRAM.md
 
 Bind via Coppergate project Configuration → Open Program bind (P-105). Validate Open IDs before enabling maintainer spend.
 
-Runtime adapter + prove (P-020): [`protocol/coppergate-runtime.md`](./protocol/coppergate-runtime.md)
+Runtime adapter + prove (P-020): [`protocol/coppergate-runtime.md`](./protocol/coppergate-runtime.md)  
+Hosted API (A-020): `https://api.opp.coppergate.ai` · client docs: [`protocol/client.md`](./protocol/client.md)  
+CI (AG-010): `check` runs `pnpm prove:coppergate-runtime`.
 
 ```bash
 pnpm install
 pnpm test
 pnpm prove:coppergate-runtime
 pnpm --filter @opp/example-wedge-verify demo
+
+# Live Community API
+curl -sS https://api.opp.coppergate.ai/health
+curl -sS https://api.opp.coppergate.ai/v1/openapi.json | head
 ```

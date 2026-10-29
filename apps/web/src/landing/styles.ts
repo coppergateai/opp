@@ -512,6 +512,22 @@ code, .mono { font-family: var(--font-mono); }
   max-width: 48ch;
 }
 
+.dx-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: -0.6rem 0 1.6rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.dx-links a {
+  color: var(--copper-bright);
+  border-bottom: 1px solid transparent;
+}
+.dx-links a:hover {
+  border-bottom-color: var(--copper-bright);
+}
+
 .code-panel {
   border-radius: 16px;
   border: 1px solid var(--line-strong);

@@ -1,4 +1,5 @@
 export const SITE_URL = "https://opp.coppergate.ai";
+export const API_URL = "https://api.opp.coppergate.ai";
 export const GITHUB_REPO = "https://github.com/coppergateai/opp";
 export const COPPERGATE_URL = "https://www.coppergate.ai";
 export const ACPP_URL = "https://acpp.coppergate.ai";
@@ -8,6 +9,9 @@ export const DOCS = {
   wedge: `${GITHUB_REPO}/blob/main/docs/WEDGE.md`,
   openProgram: `${GITHUB_REPO}/blob/main/docs/OPEN_PROGRAM.md`,
   protocol: `${GITHUB_REPO}/blob/main/docs/protocol/open-program.md`,
+  client: `${GITHUB_REPO}/blob/main/docs/protocol/client.md`,
+  hostedApi: `${GITHUB_REPO}/blob/main/docs/protocol/hosted-api.md`,
+  openapi: `${API_URL}/v1/openapi.json`,
   dogfood: `${GITHUB_REPO}/blob/main/docs/OPP_DOGFOOD.md`,
   license: `${GITHUB_REPO}/blob/main/LICENSE`,
   coppergateOpp: `${COPPERGATE_URL}/docs/OPP`,
@@ -71,18 +75,21 @@ export const STACK: ReadonlyArray<{
   },
 ];
 
-export const SDK_SAMPLE = `import { parseOpenProgramMarkdown } from "@opp/parse";
-import { evaluateSpendLicense, verifyShipReceipt } from "@opp/verify";
+export const SDK_SAMPLE = `import { OppClient } from "@opp/client";
 
-const rows = parseOpenProgramMarkdown(markdown);
+const client = new OppClient({
+  baseUrl: "https://api.opp.coppergate.ai",
+});
 
 // Invent without Open ID → deny
-evaluateSpendLicense(rows, null);
+await client.evaluateSpend({ markdown, openId: null });
 // { allowed: false, reason: "invent_without_program" }
 
 // Spend a contracted Open ID → allow
-evaluateSpendLicense(rows, "P-020");
-// { allowed: true, openId: "P-020" }
+await client.evaluateSpend({ markdown, openId: "P-030" });
+// { allowed: true, openId: "P-030" }
 
-verifyShipReceipt(rows, receipt);
-// { ok: true, openId: "P-020" }`;
+await client.verifyReceipt({ markdown, receipt });
+// { ok: true, openId: "P-030" }
+
+await client.openApi(); // GET /v1/openapi.json`;
