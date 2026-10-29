@@ -1,6 +1,13 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { isOpenId, normalizeOpenId, OPP_PROTOCOL_VERSION } from "./index.js";
+import {
+  DOCUMENTED_SCHEMA_PATHS,
+  isOpenId,
+  loadProtocolManifest,
+  loadProtocolSchema,
+  normalizeOpenId,
+  OPP_PROTOCOL_VERSION,
+} from "./index.js";
 
 describe("@opp/schema", () => {
   it("exports protocol version", () => {
@@ -13,5 +20,29 @@ describe("@opp/schema", () => {
     assert.equal(isOpenId("AG-001"), true);
     assert.equal(isOpenId("nope"), false);
     assert.equal(normalizeOpenId("p-010"), "P-010");
+  });
+
+  it("loads portable protocol manifest and schemas (P-010)", () => {
+    const manifest = loadProtocolManifest();
+    assert.equal(manifest.protocolVersion, OPP_PROTOCOL_VERSION);
+    assert.ok(manifest.schemas.length >= 2);
+
+    const ids = manifest.schemas.map((s) => s.id);
+    assert.ok(ids.includes("open-program"));
+    assert.ok(ids.includes("ship-receipt"));
+
+    for (const entry of manifest.schemas) {
+      const schema = loadProtocolSchema(entry.id);
+      assert.ok(schema, `missing schema ${entry.id}`);
+      assert.equal(typeof schema.$schema, "string");
+      assert.equal(typeof schema.$id, "string");
+      assert.equal(schema.type, "object");
+    }
+
+    assert.equal(loadProtocolSchema("unknown-id"), null);
+    assert.deepEqual([...DOCUMENTED_SCHEMA_PATHS], [
+      "/v1/schemas",
+      "/v1/schemas/{schemaId}",
+    ]);
   });
 });

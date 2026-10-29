@@ -24,6 +24,29 @@ const MD = `| Status | ID | Title | Notes |
 `;
 
 describe("@opp/api", () => {
+  it("serves portable protocol schemas (P-010)", async () => {
+    await withServer(async (port) => {
+      const base = `http://127.0.0.1:${port}`;
+      const manifest = await fetch(`${base}/v1/schemas`);
+      assert.equal(manifest.status, 200);
+      const manifestBody = (await manifest.json()) as {
+        protocolVersion: string;
+        schemas: { id: string }[];
+      };
+      assert.equal(manifestBody.protocolVersion, "0.1.0");
+      assert.ok(manifestBody.schemas.some((s) => s.id === "open-program"));
+      assert.ok(manifestBody.schemas.some((s) => s.id === "ship-receipt"));
+
+      const schema = await fetch(`${base}/v1/schemas/ship-receipt`);
+      assert.equal(schema.status, 200);
+      const schemaBody = (await schema.json()) as { title?: string };
+      assert.equal(schemaBody.title, "ShipReceiptVerifyBody");
+
+      const missing = await fetch(`${base}/v1/schemas/unknown-id`);
+      assert.equal(missing.status, 404);
+    });
+  });
+
   it("health + wedge parse/spend/verify", async () => {
     await withServer(async (port) => {
       const base = `http://127.0.0.1:${port}`;

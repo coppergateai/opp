@@ -1,3 +1,7 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 /** OPP protocol version for Open Program documents and Ship Receipts. */
 export const OPP_PROTOCOL_VERSION = "0.1.0" as const;
 
@@ -50,6 +54,50 @@ export type ShipReceiptVerifyBody = {
   };
   acceptedAt: string;
 };
+
+export type ProtocolSchemaManifest = {
+  protocolVersion: string;
+  title: string;
+  description: string;
+  schemas: Array<{
+    id: string;
+    file: string;
+    summary: string;
+  }>;
+};
+
+const packageRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+function readJson<T>(relativePath: string): T {
+  const raw = readFileSync(join(packageRoot, relativePath), "utf8");
+  return JSON.parse(raw) as T;
+}
+
+/** Manifest of portable protocol JSON Schemas (P-010). */
+export function loadProtocolManifest(): ProtocolSchemaManifest {
+  return readJson(`protocol/v${OPP_PROTOCOL_VERSION}/manifest.json`);
+}
+
+/** Load a portable protocol schema by manifest id (`open-program` | `ship-receipt`). */
+export function loadProtocolSchema(
+  schemaId: string,
+): Record<string, unknown> | null {
+  const manifest = loadProtocolManifest();
+  const entry = manifest.schemas.find((s) => s.id === schemaId);
+  if (!entry) return null;
+  return readJson(
+    `protocol/v${OPP_PROTOCOL_VERSION}/${entry.file}`,
+  ) as Record<string, unknown>;
+}
+
+/**
+ * Hosted paths that serve machine-readable schemas (P-010).
+ * OpenAPI polish for the rest of the API is A-010.
+ */
+export const DOCUMENTED_SCHEMA_PATHS = [
+  "/v1/schemas",
+  "/v1/schemas/{schemaId}",
+] as const;
 
 export function isOpenId(value: string): boolean {
   return OPEN_ID_PATTERN.test(value.trim().toUpperCase());

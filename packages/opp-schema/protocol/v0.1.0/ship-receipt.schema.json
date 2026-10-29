@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opp.coppergate.ai/schemas/protocol/v0.1.0/ship-receipt",
+  "title": "ShipReceiptVerifyBody",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "openId",
+    "title",
+    "spendMicros",
+    "fitnessScore",
+    "ci",
+    "writeback",
+    "acceptedAt"
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "ship_receipt"
+    },
+    "protocolVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "openId": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^(?:P|W|A|S|AG|RT|SEC)-\\d{2,4}$"
+        },
+        { "type": "null" }
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "spendMicros": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "fitnessScore": {
+      "type": ["number", "null"]
+    },
+    "ci": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acceptReady", "blocking", "passed", "checkCount"],
+      "properties": {
+        "acceptReady": { "type": "boolean" },
+        "blocking": { "type": "boolean" },
+        "passed": { "type": "boolean" },
+        "checkCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "writeback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["architectureId", "note"],
+      "properties": {
+        "architectureId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(?:P|W|A|S|AG|RT|SEC)-\\d{2,4}$"
+            },
+            { "type": "null" }
+          ]
+        },
+        "note": { "type": "string" }
+      }
+    },
+    "acceptedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

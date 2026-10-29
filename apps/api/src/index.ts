@@ -1,5 +1,10 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { OPP_PROTOCOL_VERSION, type ShipReceiptVerifyBody } from "@opp/schema";
+import {
+  loadProtocolManifest,
+  loadProtocolSchema,
+  OPP_PROTOCOL_VERSION,
+  type ShipReceiptVerifyBody,
+} from "@opp/schema";
 import { parseOpenProgramMarkdown, summarizeProgram } from "@opp/parse";
 import { evaluateSpendLicense, verifyShipReceipt } from "@opp/verify";
 
@@ -32,6 +37,23 @@ export function createApiServer() {
         protocolVersion: OPP_PROTOCOL_VERSION,
         product: "opp",
       });
+      return;
+    }
+
+    if (req.method === "GET" && path === "/v1/schemas") {
+      sendJson(res, 200, loadProtocolManifest());
+      return;
+    }
+
+    const schemaMatch = path.match(/^\/v1\/schemas\/([a-z0-9-]+)$/);
+    if (req.method === "GET" && schemaMatch) {
+      const schemaId = schemaMatch[1]!;
+      const schema = loadProtocolSchema(schemaId);
+      if (!schema) {
+        sendJson(res, 404, { error: "schema_not_found" });
+        return;
+      }
+      sendJson(res, 200, schema);
       return;
     }
 

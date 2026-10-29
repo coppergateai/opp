@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opp.coppergate.ai/schemas/protocol/v0.1.0/open-program",
+  "title": "OpenProgramDocument",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "programId", "title", "rows"],
+  "properties": {
+    "protocolVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "OPP protocol version (currently 0.1.0)."
+    },
+    "programId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repo": { "type": "string" },
+        "path": { "type": "string" }
+      }
+    },
+    "rows": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/openProgramRow" }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "openId": {
+      "type": "string",
+      "pattern": "^(?:P|W|A|S|AG|RT|SEC)-\\d{2,4}$",
+      "description": "Factory Open ID grammar shared with Coppergate."
+    },
+    "openProgramRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "notes", "status", "section"],
+      "properties": {
+        "id": { "$ref": "#/$defs/openId" },
+        "title": { "type": "string" },
+        "notes": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["open", "done"]
+        },
+        "section": {
+          "type": ["string", "null"]
+        }
+      }
+    }
+  }
+}

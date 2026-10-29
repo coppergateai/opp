@@ -1,0 +1,17 @@
+{
+  "protocolVersion": "0.1.0",
+  "title": "OPP portable protocol schemas",
+  "description": "Machine-readable Open Program and Ship Receipt shapes. Markdown remains the program SoT; these schemas describe the portable JSON view and public-safe receipt body.",
+  "schemas": [
+    {
+      "id": "open-program",
+      "file": "open-program.schema.json",
+      "summary": "Portable Open Program document (JSON view of OPEN_PROGRAM.md tables)"
+    },
+    {
+      "id": "ship-receipt",
+      "file": "ship-receipt.schema.json",
+      "summary": "Public-safe Ship Receipt body for verify (aligns with Coppergate P-106)"
+    }
+  ]
+}
