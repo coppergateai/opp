@@ -8,13 +8,22 @@ Coppergate consumer overview: [`coppergate/docs/OPP.md`](../../../coppergate/doc
 
 | Variable | Default | Production |
 | --- | --- | --- |
-| `OPP_API_URL` | `http://127.0.0.1:8790` | `https://api.opp.coppergate.ai` |
+| `OPP_API_URL` | unset = skip verify on Accept | `https://api.opp.coppergate.ai` |
 
 Used by:
 
 - `@coppergate/opp-client` (factory runtime)
 - `@opp/client` (first-party SDK)
-- `pnpm prove:coppergate-runtime` / `pnpm smoke:hosted-api`
+- `pnpm prove:coppergate-runtime` / `pnpm smoke:hosted-api` / `pnpm smoke:opp-hosted` (coppergate)
+
+### Production hosts (RT-040)
+
+| Host | Role |
+| --- | --- |
+| Vercel project `coppergate` | Human Accept API |
+| Fly app `coppergate-worker` | Maintainer auto-accept |
+
+Both must set `OPP_API_URL=https://api.opp.coppergate.ai`. After Accept, audit `task.ship_receipt.opp_verify` must not be `opp_api_url_unset`.
 
 ## Sequence
 

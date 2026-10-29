@@ -4,6 +4,7 @@
 
 ### Features
 
+- RT-040: Production Coppergate (`OPP_API_URL`) verifies Ship Receipts against Community OPP.
 - P-090: Landing surfaces Accept→verify + generic runtime DX links.
 - A-050: Soft per-IP rate limit (120/min) on Community API; 429 `rate_limited`.
 - P-080: Generic runtime adapter doc (`docs/protocol/generic-runtime.md`).

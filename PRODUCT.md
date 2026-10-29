@@ -4,7 +4,7 @@
 
 **Product:** OPP (Open Program Protocol)  
 **Category:** Portable program contract + Ship Receipt verification  
-**Status:** Phase 4 complete — RT-030 / P-080 / A-050 / P-090 Done (D16)  
+**Status:** Phase 5 complete — RT-040 Done (D16); prod Coppergate verifies via Community OPP  
 **Pricing:** Community / self-host **$0** only — no paid SKU UI
 
 ## 1. Promise
