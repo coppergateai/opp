@@ -4,7 +4,7 @@
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
   "buildCommand": "cd ../.. && pnpm --filter @opp/schema build && pnpm --filter @opp/parse build && pnpm --filter @opp/verify build && pnpm --filter @opp/api build",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/$1" }
+    { "source": "/(.*)", "destination": "/api" }
   ],
   "headers": [
     {

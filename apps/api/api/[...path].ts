@@ -1,5 +1,6 @@
 /**
- * Vercel serverless entry (A-020) — catch-all under /api/* with root rewrites.
+ * @deprecated Prefer repo-root `api/[...path].ts` for the opp-api Vercel project (A-020).
+ * Kept so local apps/api deploys still resolve after build.
  */
 import { handleOppRequest } from "../dist/handler.js";
 

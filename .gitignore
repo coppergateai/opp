@@ -8,5 +8,9 @@ dist
 .DS_Store
 coverage
 apps/web/public/index.html
+api/index.js
+api/[...path].js
+api/_bundle.mjs
 .vercel
 .env*
+.vercel-landing-backup

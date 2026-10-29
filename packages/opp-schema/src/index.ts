@@ -1,6 +1,15 @@
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import openProgramSchema from "../protocol/v0.1.0/open-program.schema.json" with {
+  type: "json",
+};
+import shipReceiptSchema from "../protocol/v0.1.0/ship-receipt.schema.json" with {
+  type: "json",
+};
+import protocolManifest from "../protocol/v0.1.0/manifest.json" with {
+  type: "json",
+};
+import hostedOpenApi from "../openapi/opp-hosted-v1.openapi.json" with {
+  type: "json",
+};
 
 /** OPP protocol version for Open Program documents and Ship Receipts. */
 export const OPP_PROTOCOL_VERSION = "0.1.0" as const;
@@ -66,28 +75,21 @@ export type ProtocolSchemaManifest = {
   }>;
 };
 
-const packageRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
-
-function readJson<T>(relativePath: string): T {
-  const raw = readFileSync(join(packageRoot, relativePath), "utf8");
-  return JSON.parse(raw) as T;
-}
+const PROTOCOL_SCHEMAS: Record<string, Record<string, unknown>> = {
+  "open-program": openProgramSchema as Record<string, unknown>,
+  "ship-receipt": shipReceiptSchema as Record<string, unknown>,
+};
 
 /** Manifest of portable protocol JSON Schemas (P-010). */
 export function loadProtocolManifest(): ProtocolSchemaManifest {
-  return readJson(`protocol/v${OPP_PROTOCOL_VERSION}/manifest.json`);
+  return protocolManifest as ProtocolSchemaManifest;
 }
 
 /** Load a portable protocol schema by manifest id (`open-program` | `ship-receipt`). */
 export function loadProtocolSchema(
   schemaId: string,
 ): Record<string, unknown> | null {
-  const manifest = loadProtocolManifest();
-  const entry = manifest.schemas.find((s) => s.id === schemaId);
-  if (!entry) return null;
-  return readJson(
-    `protocol/v${OPP_PROTOCOL_VERSION}/${entry.file}`,
-  ) as Record<string, unknown>;
+  return PROTOCOL_SCHEMAS[schemaId] ?? null;
 }
 
 /** Hosted HTTP API document version (URL prefix /v1). */
@@ -102,7 +104,7 @@ export type OpenApiDocument = {
 
 /** Machine-readable OpenAPI 3.1 document for the hosted OPP service (A-010). */
 export function loadHostedOpenApi(): OpenApiDocument {
-  return readJson("openapi/opp-hosted-v1.openapi.json");
+  return hostedOpenApi as OpenApiDocument;
 }
 
 /**

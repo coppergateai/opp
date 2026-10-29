@@ -13,9 +13,14 @@
     "dev": "turbo run dev --parallel",
     "assert:open-program": "node scripts/assert-open-program.mjs",
     "assert:lockfile": "node scripts/assert-lockfile.mjs",
-    "prove:coppergate-runtime": "pnpm --filter @opp/example-coppergate-runtime-prove prove"
+    "prove:coppergate-runtime": "pnpm --filter @opp/example-coppergate-runtime-prove prove",
+    "bundle:api": "node scripts/bundle-api.mjs"
+  },
+  "dependencies": {
+    "@opp/api": "workspace:*"
   },
   "devDependencies": {
+    "esbuild": "0.25.0",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   }
