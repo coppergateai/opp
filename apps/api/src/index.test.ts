@@ -4,7 +4,9 @@ import { DOCUMENTED_HOSTED_PATHS, OPP_HOSTED_API_VERSION } from "@opp/schema";
 import {
   createApiServer,
   MAX_BODY_BYTES,
+  RATE_LIMIT_MAX,
   normalizeApiPath,
+  resetRateLimitBucketsForTests,
 } from "./index.js";
 
 /** Coppergate Accept → OPP verify body (P-020). */
@@ -58,7 +60,36 @@ describe("@opp/api", () => {
     assert.equal(normalizeApiPath("/health"), "/health");
   });
 
+  it("soft rate-limits per IP (A-050)", async () => {
+    resetRateLimitBucketsForTests();
+    await withServer(async (port) => {
+      const base = `http://127.0.0.1:${port}`;
+      const headers = {
+        "content-type": "application/json",
+        "x-forwarded-for": "203.0.113.50",
+      };
+      let limited = false;
+      for (let i = 0; i < RATE_LIMIT_MAX + 2; i += 1) {
+        const res = await fetch(`${base}/v1/openapi.json`, { headers });
+        if (res.status === 429) {
+          limited = true;
+          const body = (await res.json()) as { error: string };
+          assert.equal(body.error, "rate_limited");
+          assert.ok(res.headers.get("retry-after"));
+          break;
+        }
+        assert.equal(res.status, 200);
+      }
+      assert.equal(limited, true);
+      // Health stays open under the same IP
+      const health = await fetch(`${base}/health`, { headers });
+      assert.equal(health.status, 200);
+    });
+    resetRateLimitBucketsForTests();
+  });
+
   it("allows CORS for landing + localhost origins (A-040)", async () => {
+    resetRateLimitBucketsForTests();
     await withServer(async (port) => {
       const base = `http://127.0.0.1:${port}`;
       const allowed = await fetch(`${base}/health`, {
@@ -92,6 +123,7 @@ describe("@opp/api", () => {
   });
 
   it("rejects oversized or non-JSON POST bodies (A-030)", async () => {
+    resetRateLimitBucketsForTests();
     await withServer(async (port) => {
       const base = `http://127.0.0.1:${port}`;
       const wrongType = await fetch(`${base}/v1/programs/parse`, {
@@ -119,6 +151,7 @@ describe("@opp/api", () => {
   });
 
   it("serves OpenAPI and polished errors/pagination (A-010)", async () => {
+    resetRateLimitBucketsForTests();
     await withServer(async (port) => {
       const base = `http://127.0.0.1:${port}`;
       const openapi = await fetch(`${base}/v1/openapi.json`);
@@ -190,6 +223,7 @@ describe("@opp/api", () => {
   });
 
   it("Coppergate Accept receipt verifies over HTTP (P-020)", async () => {
+    resetRateLimitBucketsForTests();
     await withServer(async (port) => {
       const base = `http://127.0.0.1:${port}`;
       const markdown = `| Status | ID | Title | Notes |
@@ -226,6 +260,7 @@ describe("@opp/api", () => {
   });
 
   it("serves portable protocol schemas (P-010)", async () => {
+    resetRateLimitBucketsForTests();
     await withServer(async (port) => {
       const base = `http://127.0.0.1:${port}`;
       const manifest = await fetch(`${base}/v1/schemas`);
@@ -249,6 +284,7 @@ describe("@opp/api", () => {
   });
 
   it("health + wedge parse/spend/verify", async () => {
+    resetRateLimitBucketsForTests();
     await withServer(async (port) => {
       const base = `http://127.0.0.1:${port}`;
       const health = await fetch(`${base}/health`);

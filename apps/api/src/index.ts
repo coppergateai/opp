@@ -4,9 +4,14 @@ import { handleOppRequest } from "./handler.js";
 export type { ApiErrorBody } from "./handler.js";
 export {
   CORS_ALLOWED_ORIGINS,
+  RATE_LIMIT_MAX,
+  RATE_LIMIT_WINDOW_MS,
+  clientIpFromRequest,
+  consumeRateLimit,
   handleOppRequest,
   MAX_BODY_BYTES,
   normalizeApiPath,
+  resetRateLimitBucketsForTests,
   resolveCorsOrigin,
 } from "./handler.js";
 

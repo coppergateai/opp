@@ -50,6 +50,10 @@ Allowed: `https://opp.coppergate.ai`, `http://localhost:{3000,4173,5173}`, `http
 
 `OPTIONS` preflight returns **204** with the same allowlist rules.
 
+### Rate limit (A-050)
+
+Soft per-IP sliding window (**120** requests / **60s**, in-process). Exceeding returns **429** `rate_limited` with `Retry-After`. `/health` and `/ready` are exempt. Best-effort on multi-instance serverless (not a global quota).
+
 ## Live smoke (P-050)
 
 ```bash

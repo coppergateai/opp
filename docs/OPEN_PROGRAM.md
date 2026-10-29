@@ -12,13 +12,24 @@ ARCHITECTURE_REPO=coppergateai/opp
 ARCHITECTURE_PATHS=docs/OPEN_PROGRAM.md
 ```
 
+## Phase 4 — Portability & production dogfood (complete)
+
+Prove the factory loop in ops, then a non-Coppergate runtime sketch + light API abuse floor. Community **$0** only.
+
+| Status | ID | Title | Notes |
+| --- | --- | --- | --- |
+| Done | RT-030 | Hosted factory `OPP_API_URL` ops + prove | env example + `pnpm smoke:opp-hosted`; [PR #202](https://github.com/coppergateai/coppergate/pull/202) |
+| Done | P-080 | Generic runtime adapter doc (non-Coppergate) | `docs/protocol/generic-runtime.md` |
+| Done | A-050 | Soft per-IP rate limit on Community API | 120/min; 429 `rate_limited`; health exempt |
+| Done | P-090 | Landing surfaces verify path + Phase status | Accept→verify + any-runtime links on opp.coppergate.ai |
+
 ## Phase 3 — Close factory loop (complete)
 
 Wire Coppergate Accept into live OPP verify, then portable DX/hardening. Community **$0** only.
 
 | Status | ID | Title | Notes |
 | --- | --- | --- | --- |
-| Done | RT-020 | Coppergate Accept → OPP verify | After `persistShipReceipt`, project + `OppClient.verifyReceipt` when `OPP_API_URL` set; audit only; never block Accept; [PR #201](https://github.com/coppergateai/coppergate/pull/201) |
+| Done | RT-020 | Coppergate Accept → OPP verify | After `persistShipReceipt`, project + `OppClient.verifyReceipt` when `OPP_API_URL` set; audit only; never block Accept; merged [PR #201](https://github.com/coppergateai/coppergate/pull/201) |
 | Done | P-070 | `@opp/schema` README | Parity with P-060 package DX |
 | Done | A-040 | Community API CORS | Allowlist `opp.coppergate.ai` + localhost; OPTIONS preflight |
 | Done | AG-020 | CI assert Done IDs have ship-receipts | `pnpm assert:ship-receipts` in `check` |

@@ -20,8 +20,11 @@
 
 **Coppergate** — Open Program Runtime / Survivor selection. See [`protocol/coppergate-runtime.md`](./protocol/coppergate-runtime.md) and [`coppergate/docs/OPP.md`](../../coppergate/docs/OPP.md).
 
+Any other runtime: [`protocol/generic-runtime.md`](./protocol/generic-runtime.md) (P-080).
+
 Prove without a live Arena:
 
 ```bash
 pnpm prove:coppergate-runtime
+pnpm smoke:hosted-api
 ```

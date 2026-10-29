@@ -17,6 +17,49 @@ export type ApiErrorBody = {
 /** A-030 — max JSON body size for POST routes (256 KiB). */
 export const MAX_BODY_BYTES = 256 * 1024;
 
+/** A-050 — soft per-IP sliding window (in-process; best-effort on serverless). */
+export const RATE_LIMIT_WINDOW_MS = 60_000;
+export const RATE_LIMIT_MAX = 120;
+
+type RateBucket = { count: number; resetAt: number };
+const rateBuckets = new Map<string, RateBucket>();
+
+export function clientIpFromRequest(request: Request): string {
+  const xf = request.headers.get("x-forwarded-for");
+  if (xf) {
+    const first = xf.split(",")[0]?.trim();
+    if (first) return first.slice(0, 128);
+  }
+  const real = request.headers.get("x-real-ip")?.trim();
+  if (real) return real.slice(0, 128);
+  return "unknown";
+}
+
+export function consumeRateLimit(
+  ip: string,
+  now = Date.now(),
+): { ok: true; remaining: number } | { ok: false; retryAfterSec: number } {
+  const key = ip || "unknown";
+  let bucket = rateBuckets.get(key);
+  if (!bucket || now >= bucket.resetAt) {
+    bucket = { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+    rateBuckets.set(key, bucket);
+  }
+  if (bucket.count >= RATE_LIMIT_MAX) {
+    return {
+      ok: false,
+      retryAfterSec: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)),
+    };
+  }
+  bucket.count += 1;
+  return { ok: true, remaining: RATE_LIMIT_MAX - bucket.count };
+}
+
+/** Test helper — clear in-process rate buckets. */
+export function resetRateLimitBucketsForTests(): void {
+  rateBuckets.clear();
+}
+
 /** A-040 — browser origins allowed to call the Community API. */
 export const CORS_ALLOWED_ORIGINS = [
   "https://opp.coppergate.ai",
@@ -219,7 +262,7 @@ function bodyError(
 }
 
 /**
- * Fetch-compatible OPP API handler (A-020 / A-030 / A-040).
+ * Fetch-compatible OPP API handler (A-020 / A-030 / A-040 / A-050).
  * Used by Node `createApiServer` and Vercel serverless.
  */
 export async function handleOppRequest(request: Request): Promise<Response> {
@@ -243,6 +286,31 @@ export async function handleOppRequest(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const path = normalizeApiPath(url.pathname);
     const method = request.method.toUpperCase();
+
+    if (path !== "/health" && path !== "/ready") {
+      const limited = consumeRateLimit(clientIpFromRequest(request));
+      if (!limited.ok) {
+        return new Response(
+          JSON.stringify({
+            error: "rate_limited",
+            message: `Too many requests — retry after ${limited.retryAfterSec}s`,
+            details: {
+              retryAfterSec: limited.retryAfterSec,
+              limit: RATE_LIMIT_MAX,
+              windowMs: RATE_LIMIT_WINDOW_MS,
+            },
+          }),
+          {
+            status: 429,
+            headers: {
+              "content-type": "application/json; charset=utf-8",
+              "retry-after": String(limited.retryAfterSec),
+              ...corsHeaders(request),
+            },
+          },
+        );
+      }
+    }
 
     if (path === "/health" || path === "/ready") {
       if (method !== "GET" && method !== "HEAD") {

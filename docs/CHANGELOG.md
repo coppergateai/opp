@@ -4,6 +4,10 @@
 
 ### Features
 
+- P-090: Landing surfaces Accept→verify + generic runtime DX links.
+- A-050: Soft per-IP rate limit (120/min) on Community API; 429 `rate_limited`.
+- P-080: Generic runtime adapter doc (`docs/protocol/generic-runtime.md`).
+- RT-030: Coppergate `OPP_API_URL` ops + `pnpm smoke:opp-hosted`.
 - AG-020: CI asserts every Done Open ID has `docs/ship-receipts/{ID}.md`.
 - A-040: Community API CORS allowlist (`opp.coppergate.ai` + localhost) + OPTIONS.
 - P-070: `@opp/schema` package README.
