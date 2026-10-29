@@ -14,6 +14,9 @@ export type ApiErrorBody = {
   details?: unknown;
 };
 
+/** A-030 — max JSON body size for POST routes (256 KiB). */
+export const MAX_BODY_BYTES = 256 * 1024;
+
 function jsonResponse(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -37,15 +40,72 @@ function errorResponse(
   return jsonResponse(status, body);
 }
 
+function jsonContentTypeOk(request: Request): boolean {
+  const raw = request.headers.get("content-type") ?? "";
+  const media = raw.split(";")[0]?.trim().toLowerCase() ?? "";
+  return media === "application/json";
+}
+
+function contentLengthTooLarge(request: Request): boolean {
+  const len = request.headers.get("content-length");
+  if (len === null || len === "") return false;
+  const n = Number(len);
+  return Number.isFinite(n) && n > MAX_BODY_BYTES;
+}
+
 async function readJsonBody(
   request: Request,
-): Promise<{ ok: true; value: unknown } | { ok: false; error: string }> {
-  const text = await request.text();
-  if (!text) return { ok: true, value: {} };
+): Promise<
+  | { ok: true; value: unknown }
+  | {
+      ok: false;
+      status: number;
+      error: string;
+      message: string;
+      details?: unknown;
+    }
+> {
+  if (!jsonContentTypeOk(request)) {
+    return {
+      ok: false,
+      status: 415,
+      error: "unsupported_media_type",
+      message: "POST bodies must use Content-Type: application/json",
+    };
+  }
+  if (contentLengthTooLarge(request)) {
+    return {
+      ok: false,
+      status: 413,
+      error: "payload_too_large",
+      message: `Request body exceeds ${MAX_BODY_BYTES} bytes`,
+      details: { maxBytes: MAX_BODY_BYTES },
+    };
+  }
+
+  const buf = new Uint8Array(await request.arrayBuffer());
+  if (buf.byteLength > MAX_BODY_BYTES) {
+    return {
+      ok: false,
+      status: 413,
+      error: "payload_too_large",
+      message: `Request body exceeds ${MAX_BODY_BYTES} bytes`,
+      details: { maxBytes: MAX_BODY_BYTES },
+    };
+  }
+  if (buf.byteLength === 0) return { ok: true, value: {} };
   try {
-    return { ok: true, value: JSON.parse(text) as unknown };
+    return {
+      ok: true,
+      value: JSON.parse(new TextDecoder().decode(buf)) as unknown,
+    };
   } catch {
-    return { ok: false, error: "invalid_json" };
+    return {
+      ok: false,
+      status: 400,
+      error: "invalid_json",
+      message: "Request body must be valid JSON",
+    };
   }
 }
 
@@ -104,8 +164,24 @@ export function normalizeApiPath(pathname: string): string {
   return pathname;
 }
 
+function bodyError(
+  parsed: {
+    status: number;
+    error: string;
+    message: string;
+    details?: unknown;
+  },
+): Response {
+  return errorResponse(
+    parsed.status,
+    parsed.error,
+    parsed.message,
+    parsed.details,
+  );
+}
+
 /**
- * Fetch-compatible OPP API handler (A-020).
+ * Fetch-compatible OPP API handler (A-020 / A-030).
  * Used by Node `createApiServer` and Vercel serverless.
  */
 export async function handleOppRequest(request: Request): Promise<Response> {
@@ -173,11 +249,7 @@ export async function handleOppRequest(request: Request): Promise<Response> {
       }
       const parsedBody = await readJsonBody(request);
       if (!parsedBody.ok) {
-        return errorResponse(
-          400,
-          "invalid_json",
-          "Request body must be valid JSON",
-        );
+        return bodyError(parsedBody);
       }
       const body = parsedBody.value as {
         markdown?: string;
@@ -226,11 +298,7 @@ export async function handleOppRequest(request: Request): Promise<Response> {
       }
       const parsedBody = await readJsonBody(request);
       if (!parsedBody.ok) {
-        return errorResponse(
-          400,
-          "invalid_json",
-          "Request body must be valid JSON",
-        );
+        return bodyError(parsedBody);
       }
       const body = parsedBody.value as {
         markdown?: string;
@@ -254,11 +322,7 @@ export async function handleOppRequest(request: Request): Promise<Response> {
       }
       const parsedBody = await readJsonBody(request);
       if (!parsedBody.ok) {
-        return errorResponse(
-          400,
-          "invalid_json",
-          "Request body must be valid JSON",
-        );
+        return bodyError(parsedBody);
       }
       const body = parsedBody.value as {
         markdown?: string;

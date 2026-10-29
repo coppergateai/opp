@@ -2,7 +2,11 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { handleOppRequest } from "./handler.js";
 
 export type { ApiErrorBody } from "./handler.js";
-export { handleOppRequest, normalizeApiPath } from "./handler.js";
+export {
+  handleOppRequest,
+  MAX_BODY_BYTES,
+  normalizeApiPath,
+} from "./handler.js";
 
 async function incomingToRequest(req: IncomingMessage): Promise<Request> {
   const host = req.headers.host ?? "127.0.0.1";

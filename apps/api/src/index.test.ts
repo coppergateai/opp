@@ -1,7 +1,11 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { DOCUMENTED_HOSTED_PATHS, OPP_HOSTED_API_VERSION } from "@opp/schema";
-import { createApiServer, normalizeApiPath } from "./index.js";
+import {
+  createApiServer,
+  MAX_BODY_BYTES,
+  normalizeApiPath,
+} from "./index.js";
 
 /** Coppergate Accept → OPP verify body (P-020). */
 function coppergateProjectedReceipt(openId: string) {
@@ -52,6 +56,33 @@ describe("@opp/api", () => {
     assert.equal(normalizeApiPath("/api/health"), "/health");
     assert.equal(normalizeApiPath("/api/v1/openapi.json"), "/v1/openapi.json");
     assert.equal(normalizeApiPath("/health"), "/health");
+  });
+
+  it("rejects oversized or non-JSON POST bodies (A-030)", async () => {
+    await withServer(async (port) => {
+      const base = `http://127.0.0.1:${port}`;
+      const wrongType = await fetch(`${base}/v1/programs/parse`, {
+        method: "POST",
+        headers: { "content-type": "text/plain" },
+        body: "nope",
+      });
+      assert.equal(wrongType.status, 415);
+      const wrongBody = (await wrongType.json()) as { error: string };
+      assert.equal(wrongBody.error, "unsupported_media_type");
+
+      const huge = JSON.stringify({
+        markdown: "x".repeat(MAX_BODY_BYTES),
+      });
+      assert.ok(huge.length > MAX_BODY_BYTES);
+      const tooBig = await fetch(`${base}/v1/programs/parse`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: huge,
+      });
+      assert.equal(tooBig.status, 413);
+      const bigBody = (await tooBig.json()) as { error: string };
+      assert.equal(bigBody.error, "payload_too_large");
+    });
   });
 
   it("serves OpenAPI and polished errors/pagination (A-010)", async () => {

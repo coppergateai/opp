@@ -4,6 +4,8 @@
 
 ### Features
 
+- P-050: CI smokes live Community API (`pnpm smoke:hosted-api`).
+- A-030: Hosted API rejects non-JSON POST (415) and bodies over 256 KiB (413).
 - AG-010: CI `check` runs `pnpm prove:coppergate-runtime`.
 - P-040: Landing + docs surface OpenAPI, `@opp/client`, and `api.opp.coppergate.ai` (Phase 1 complete).
 - A-020: Community hosted API at `https://api.opp.coppergate.ai` (Vercel serverless Fetch handler). $0 only.

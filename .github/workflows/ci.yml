@@ -45,5 +45,8 @@ jobs:
       - name: Coppergate runtime prove (AG-010)
         run: pnpm prove:coppergate-runtime
 
+      - name: Live Community API smoke (P-050)
+        run: pnpm smoke:hosted-api
+
       - name: Open Program assert
         run: pnpm assert:open-program

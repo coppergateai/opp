@@ -35,6 +35,20 @@ All error responses use:
 
 Optional `details` may carry structured context. `error` is the stable machine code (unchanged from earlier string-only responses).
 
+### Request limits (A-030)
+
+| Rule | Status | Code |
+| --- | --- | --- |
+| POST without `Content-Type: application/json` | 415 | `unsupported_media_type` |
+| Body larger than **256 KiB** | 413 | `payload_too_large` |
+
+## Live smoke (P-050)
+
+```bash
+pnpm smoke:hosted-api
+# or OPP_API_URL=http://127.0.0.1:8790 pnpm smoke:hosted-api
+```
+
 ## Pagination
 
 `POST /v1/programs/parse` accepts optional `limit` (1–500) and `offset` (≥0). When `limit` is set, the response includes:

@@ -12,6 +12,17 @@ ARCHITECTURE_REPO=coppergateai/opp
 ARCHITECTURE_PATHS=docs/OPEN_PROGRAM.md
 ```
 
+## Phase 2 — Harden & live dogfood (spend next — P-060)
+
+Keep the Community API honest under light abuse and prove it from CI. Community **$0** only.
+
+| Status | ID | Title | Notes |
+| --- | --- | --- | --- |
+| Done | P-050 | Live Community API smoke in CI | health + invent-deny against `api.opp.coppergate.ai` |
+| Done | A-030 | Hosted API body size + content-type limits | abuse floor; no paid SKU |
+| Open | P-060 | Package READMEs for `@opp/client` / parse / verify | SDK consumer DX |
+| Open | RT-010 | Coppergate `OPP_API_URL` Accept→verify runbook | docs + cross-link; factory follow-up |
+
 ## Phase 1 — Dogfood / DX (complete)
 
 Close the wedge for external runtimes: first-party client, hosted Community API, CI prove, landing DX. Community **$0** only.

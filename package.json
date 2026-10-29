@@ -14,6 +14,7 @@
     "assert:open-program": "node scripts/assert-open-program.mjs",
     "assert:lockfile": "node scripts/assert-lockfile.mjs",
     "prove:coppergate-runtime": "pnpm --filter @opp/example-coppergate-runtime-prove prove",
+    "smoke:hosted-api": "node scripts/smoke-hosted-api.mjs",
     "bundle:api": "node scripts/bundle-api.mjs"
   },
   "dependencies": {
