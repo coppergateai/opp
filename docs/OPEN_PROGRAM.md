@@ -18,7 +18,7 @@ Prove the factory loop in ops, then a non-Coppergate runtime sketch + light API 
 
 | Status | ID | Title | Notes |
 | --- | --- | --- | --- |
-| Done | RT-030 | Hosted factory `OPP_API_URL` ops + prove | env example + `pnpm smoke:opp-hosted`; [PR #202](https://github.com/coppergateai/coppergate/pull/202) |
+| Done | RT-030 | Hosted factory `OPP_API_URL` ops + prove | env example + `pnpm smoke:opp-hosted`; merged [PR #202](https://github.com/coppergateai/coppergate/pull/202) |
 | Done | P-080 | Generic runtime adapter doc (non-Coppergate) | `docs/protocol/generic-runtime.md` |
 | Done | A-050 | Soft per-IP rate limit on Community API | 120/min; 429 `rate_limited`; health exempt |
 | Done | P-090 | Landing surfaces verify path + Phase status | Accept→verify + any-runtime links on opp.coppergate.ai |

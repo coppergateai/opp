@@ -163,13 +163,15 @@ export function renderDevelopers(): string {
   return `
 <section class="section" id="developers" aria-labelledby="dev-title">
   <div class="container">
-    <p class="section-kicker">Developers</p>
+    <p class="section-kicker">Developers · Phase 4</p>
     <h2 id="dev-title">Parse. License. Verify.</h2>
-    <p class="section-lead">@opp/client against the Community API — same Open Program grammar Coppergate already spends.</p>
+    <p class="section-lead">@opp/client against the Community API — invent deny, spend allow, Ship Receipt verify. Factory Accept wires the same path via <code>OPP_API_URL</code>.</p>
     <p class="dx-links" data-reveal>
       <a href="${escapeHtml(DOCS.openapi)}" rel="noopener noreferrer">OpenAPI</a>
       <a href="${escapeHtml(DOCS.client)}" rel="noopener noreferrer">@opp/client</a>
-      <a href="${escapeHtml(API_URL)}" rel="noopener noreferrer">${escapeHtml(API_URL.replace("https://", ""))}</a>
+      <a href="${escapeHtml(DOCS.health)}" rel="noopener noreferrer">api.opp health</a>
+      <a href="${escapeHtml(DOCS.acceptVerify)}" rel="noopener noreferrer">Accept → verify</a>
+      <a href="${escapeHtml(DOCS.genericRuntime)}" rel="noopener noreferrer">Any runtime</a>
       <a href="${escapeHtml(DOCS.hostedApi)}" rel="noopener noreferrer">Hosted API docs</a>
     </p>
     <div class="code-panel" data-reveal>

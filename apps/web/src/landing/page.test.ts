@@ -23,4 +23,13 @@ describe("OPP landing", () => {
     assert.match(html, /api\.opp\.coppergate\.ai/);
     assert.match(html, /OppClient/);
   });
+
+  it("surfaces Accept→verify and generic runtime (P-090)", () => {
+    const html = renderLandingPage();
+    assert.match(html, /Developers · Phase 4/);
+    assert.match(html, /docs\/protocol\/accept-verify-runbook\.md/);
+    assert.match(html, /docs\/protocol\/generic-runtime\.md/);
+    assert.match(html, /api\.opp\.coppergate\.ai\/health/);
+    assert.match(html, /OPP_API_URL/);
+  });
 });
