@@ -16,6 +16,8 @@ Community / self-host **$0** only — no paid SKU.
 
 Source: `packages/opp-schema/openapi/opp-hosted-v1.openapi.json` via `loadHostedOpenApi()`.
 
+TypeScript client: [`client.md`](./client.md) (`@opp/client`).
+
 ```bash
 curl -sS http://127.0.0.1:8790/v1/openapi.json | jq .info.version
 ```

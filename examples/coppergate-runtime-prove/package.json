@@ -11,6 +11,7 @@
     "lint": "node -e \"process.exit(0)\""
   },
   "dependencies": {
+    "@opp/client": "workspace:*",
     "@opp/parse": "workspace:*",
     "@opp/schema": "workspace:*",
     "@opp/verify": "workspace:*"

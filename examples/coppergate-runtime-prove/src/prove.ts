@@ -7,6 +7,7 @@
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { OppClient } from "@opp/client";
 import { parseOpenProgramMarkdown, summarizeProgram } from "@opp/parse";
 import { OPP_PROTOCOL_VERSION } from "@opp/schema";
 import { evaluateSpendLicense, verifyShipReceipt } from "@opp/verify";
@@ -30,38 +31,6 @@ export const FIXTURE_PROGRAM = `# Open Program fixture (P-020 prove)
 `;
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
-
-async function evaluateViaHttp(
-  baseUrl: string,
-  markdown: string,
-  openId: string | null,
-): Promise<{ allowed: boolean; reason?: string; openId?: string }> {
-  const res = await fetch(`${baseUrl.replace(/\/$/, "")}/v1/spend/evaluate`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ markdown, openId }),
-  });
-  const body = (await res.json()) as {
-    decision: { allowed: boolean; reason?: string; openId?: string };
-  };
-  return body.decision;
-}
-
-async function verifyViaHttp(
-  baseUrl: string,
-  markdown: string,
-  receipt: ReturnType<typeof projectCoppergateReceiptToOpp>,
-): Promise<{ ok: boolean; reason?: string; openId?: string }> {
-  const res = await fetch(`${baseUrl.replace(/\/$/, "")}/v1/receipts/verify`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ markdown, receipt }),
-  });
-  const body = (await res.json()) as {
-    result: { ok: boolean; reason?: string; openId?: string };
-  };
-  return body.result;
-}
 
 export async function runProve(options?: {
   apiUrl?: string | null;
@@ -102,9 +71,19 @@ export async function runProve(options?: {
 
   if (apiUrl) {
     mode = "http";
-    invent = await evaluateViaHttp(apiUrl, FIXTURE_PROGRAM, null);
-    spend = await evaluateViaHttp(apiUrl, FIXTURE_PROGRAM, "P-020");
-    receipt = await verifyViaHttp(apiUrl, FIXTURE_PROGRAM, oppBody);
+    const client = new OppClient({ baseUrl: apiUrl });
+    invent = await client.evaluateSpend({
+      markdown: FIXTURE_PROGRAM,
+      openId: null,
+    });
+    spend = await client.evaluateSpend({
+      markdown: FIXTURE_PROGRAM,
+      openId: "P-020",
+    });
+    receipt = await client.verifyReceipt({
+      markdown: FIXTURE_PROGRAM,
+      receipt: oppBody,
+    });
   }
 
   const ok =
