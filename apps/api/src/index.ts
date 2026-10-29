@@ -3,9 +3,11 @@ import { handleOppRequest } from "./handler.js";
 
 export type { ApiErrorBody } from "./handler.js";
 export {
+  CORS_ALLOWED_ORIGINS,
   handleOppRequest,
   MAX_BODY_BYTES,
   normalizeApiPath,
+  resolveCorsOrigin,
 } from "./handler.js";
 
 async function incomingToRequest(req: IncomingMessage): Promise<Request> {

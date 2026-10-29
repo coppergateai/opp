@@ -95,6 +95,6 @@ pnpm smoke:hosted-api
 | `writeback_mismatch` | `writeback.architectureId` ≠ `openId` |
 | `health` 404 / HTML | API domain pointed at landing project — see [`hosted-deploy.md`](./hosted-deploy.md) |
 
-## Factory follow-up
+## Factory wire-up (RT-020)
 
-Wire `@coppergate/opp-client.verifyReceipt` into the Accept path after projection (product change in `coppergateai/coppergate`). This runbook is the contract; the factory PR is separate.
+When `OPP_API_URL` is set, Coppergate Accept → `persistShipReceipt` → `projectShipReceiptToOpp` → `OppClient.verifyReceipt`. Audit action: `task.ship_receipt.opp_verify`. Verify failures never roll back Accept.

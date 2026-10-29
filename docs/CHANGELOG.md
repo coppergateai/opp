@@ -4,6 +4,10 @@
 
 ### Features
 
+- AG-020: CI asserts every Done Open ID has `docs/ship-receipts/{ID}.md`.
+- A-040: Community API CORS allowlist (`opp.coppergate.ai` + localhost) + OPTIONS.
+- P-070: `@opp/schema` package README.
+- RT-020: Coppergate Accept projects Ship Receipt and verifies via OPP when `OPP_API_URL` is set.
 - RT-010: Accept→OPP verify runbook (`OPP_API_URL`, projection, hosted verify).
 - P-060: Package READMEs for `@opp/client`, `@opp/parse`, `@opp/verify`.
 - P-050: CI smokes live Community API (`pnpm smoke:hosted-api`).

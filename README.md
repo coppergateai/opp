@@ -7,7 +7,7 @@ Second external Coppergate factory product ([D16](../coppergate-architecture/doc
 
 | Package | Role |
 | --- | --- |
-| `@opp/schema` | Open ID / program / receipt types + JSON Schemas (`/v1/schemas`) |
+| [`@opp/schema`](./packages/opp-schema/README.md) | Open ID / program / receipt types + JSON Schemas (`/v1/schemas`) |
 | [`@opp/parse`](./packages/opp-parse/README.md) | Markdown → program rows |
 | [`@opp/verify`](./packages/opp-verify/README.md) | Spend License + receipt verify |
 | [`@opp/client`](./packages/opp-client/README.md) | First-party HTTP SDK ([docs](./docs/protocol/client.md)) |

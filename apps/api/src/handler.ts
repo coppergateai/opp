@@ -17,14 +17,49 @@ export type ApiErrorBody = {
 /** A-030 — max JSON body size for POST routes (256 KiB). */
 export const MAX_BODY_BYTES = 256 * 1024;
 
-function jsonResponse(status: number, body: unknown): Response {
+/** A-040 — browser origins allowed to call the Community API. */
+export const CORS_ALLOWED_ORIGINS = [
+  "https://opp.coppergate.ai",
+  "http://127.0.0.1:4173",
+  "http://localhost:4173",
+  "http://127.0.0.1:5173",
+  "http://localhost:5173",
+  "http://127.0.0.1:3000",
+  "http://localhost:3000",
+] as const;
+
+export function resolveCorsOrigin(request: Request): string | null {
+  const origin = request.headers.get("origin");
+  if (!origin) return null;
+  return (CORS_ALLOWED_ORIGINS as readonly string[]).includes(origin)
+    ? origin
+    : null;
+}
+
+function corsHeaders(request: Request): Record<string, string> {
+  const allowed = resolveCorsOrigin(request);
+  const headers: Record<string, string> = {
+    "access-control-allow-methods": "GET, HEAD, POST, OPTIONS",
+    "access-control-allow-headers": "content-type",
+    "access-control-max-age": "86400",
+  };
+  if (allowed) {
+    headers["access-control-allow-origin"] = allowed;
+    headers.vary = "Origin";
+  }
+  return headers;
+}
+
+function jsonResponse(
+  status: number,
+  body: unknown,
+  request?: Request,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "access-control-allow-origin": "*",
-      "access-control-allow-methods": "GET, HEAD, POST, OPTIONS",
-      "access-control-allow-headers": "content-type",
+      ...(request ? corsHeaders(request) : {}),
     },
   });
 }
@@ -34,10 +69,11 @@ function errorResponse(
   code: string,
   message: string,
   details?: unknown,
+  request?: Request,
 ): Response {
   const body: ApiErrorBody = { error: code, message };
   if (details !== undefined) body.details = details;
-  return jsonResponse(status, body);
+  return jsonResponse(status, body, request);
 }
 
 function jsonContentTypeOk(request: Request): boolean {
@@ -171,29 +207,36 @@ function bodyError(
     message: string;
     details?: unknown;
   },
+  request: Request,
 ): Response {
   return errorResponse(
     parsed.status,
     parsed.error,
     parsed.message,
     parsed.details,
+    request,
   );
 }
 
 /**
- * Fetch-compatible OPP API handler (A-020 / A-030).
+ * Fetch-compatible OPP API handler (A-020 / A-030 / A-040).
  * Used by Node `createApiServer` and Vercel serverless.
  */
 export async function handleOppRequest(request: Request): Promise<Response> {
+  const ok = (status: number, body: unknown) =>
+    jsonResponse(status, body, request);
+  const fail = (
+    status: number,
+    code: string,
+    message: string,
+    details?: unknown,
+  ) => errorResponse(status, code, message, details, request);
+
   try {
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
-        headers: {
-          "access-control-allow-origin": "*",
-          "access-control-allow-methods": "GET, HEAD, POST, OPTIONS",
-          "access-control-allow-headers": "content-type",
-        },
+        headers: corsHeaders(request),
       });
     }
 
@@ -203,9 +246,9 @@ export async function handleOppRequest(request: Request): Promise<Response> {
 
     if (path === "/health" || path === "/ready") {
       if (method !== "GET" && method !== "HEAD") {
-        return errorResponse(405, "method_not_allowed", "Use GET");
+        return fail(405, "method_not_allowed", "Use GET");
       }
-      return jsonResponse(200, {
+      return ok(200, {
         ok: true,
         protocolVersion: OPP_PROTOCOL_VERSION,
         product: "opp",
@@ -214,42 +257,42 @@ export async function handleOppRequest(request: Request): Promise<Response> {
 
     if (path === "/v1/openapi.json") {
       if (method !== "GET") {
-        return errorResponse(405, "method_not_allowed", "Use GET");
+        return fail(405, "method_not_allowed", "Use GET");
       }
-      return jsonResponse(200, loadHostedOpenApi());
+      return ok(200, loadHostedOpenApi());
     }
 
     if (path === "/v1/schemas") {
       if (method !== "GET") {
-        return errorResponse(405, "method_not_allowed", "Use GET");
+        return fail(405, "method_not_allowed", "Use GET");
       }
-      return jsonResponse(200, loadProtocolManifest());
+      return ok(200, loadProtocolManifest());
     }
 
     const schemaMatch = path.match(/^\/v1\/schemas\/([a-z0-9-]+)$/);
     if (schemaMatch) {
       if (method !== "GET") {
-        return errorResponse(405, "method_not_allowed", "Use GET");
+        return fail(405, "method_not_allowed", "Use GET");
       }
       const schemaId = schemaMatch[1]!;
       const schema = loadProtocolSchema(schemaId);
       if (!schema) {
-        return errorResponse(
+        return fail(
           404,
           "schema_not_found",
           `Unknown schema id: ${schemaId}`,
         );
       }
-      return jsonResponse(200, schema);
+      return ok(200, schema);
     }
 
     if (path === "/v1/programs/parse") {
       if (method !== "POST") {
-        return errorResponse(405, "method_not_allowed", "Use POST");
+        return fail(405, "method_not_allowed", "Use POST");
       }
       const parsedBody = await readJsonBody(request);
       if (!parsedBody.ok) {
-        return bodyError(parsedBody);
+        return bodyError(parsedBody, request);
       }
       const body = parsedBody.value as {
         markdown?: string;
@@ -258,7 +301,7 @@ export async function handleOppRequest(request: Request): Promise<Response> {
         offset?: number;
       };
       if (!body.markdown || typeof body.markdown !== "string") {
-        return errorResponse(
+        return fail(
           400,
           "markdown_required",
           "Body field `markdown` (string) is required",
@@ -266,7 +309,7 @@ export async function handleOppRequest(request: Request): Promise<Response> {
       }
       const page = parsePage({ limit: body.limit, offset: body.offset });
       if (!page.ok) {
-        return errorResponse(400, page.code, page.message);
+        return fail(400, page.code, page.message);
       }
       const rows = parseOpenProgramMarkdown(body.markdown);
       const summary = summarizeProgram(rows);
@@ -274,7 +317,7 @@ export async function handleOppRequest(request: Request): Promise<Response> {
         page.limit === null
           ? rows
           : rows.slice(page.offset, page.offset + page.limit);
-      return jsonResponse(200, {
+      return ok(200, {
         protocolVersion: OPP_PROTOCOL_VERSION,
         programId: body.programId ?? "inline",
         rows: sliced,
@@ -294,18 +337,18 @@ export async function handleOppRequest(request: Request): Promise<Response> {
 
     if (path === "/v1/spend/evaluate") {
       if (method !== "POST") {
-        return errorResponse(405, "method_not_allowed", "Use POST");
+        return fail(405, "method_not_allowed", "Use POST");
       }
       const parsedBody = await readJsonBody(request);
       if (!parsedBody.ok) {
-        return bodyError(parsedBody);
+        return bodyError(parsedBody, request);
       }
       const body = parsedBody.value as {
         markdown?: string;
         openId?: string | null;
       };
       if (!body.markdown || typeof body.markdown !== "string") {
-        return errorResponse(
+        return fail(
           400,
           "markdown_required",
           "Body field `markdown` (string) is required",
@@ -313,16 +356,16 @@ export async function handleOppRequest(request: Request): Promise<Response> {
       }
       const rows = parseOpenProgramMarkdown(body.markdown);
       const decision = evaluateSpendLicense(rows, body.openId);
-      return jsonResponse(decision.allowed ? 200 : 403, { decision });
+      return ok(decision.allowed ? 200 : 403, { decision });
     }
 
     if (path === "/v1/receipts/verify") {
       if (method !== "POST") {
-        return errorResponse(405, "method_not_allowed", "Use POST");
+        return fail(405, "method_not_allowed", "Use POST");
       }
       const parsedBody = await readJsonBody(request);
       if (!parsedBody.ok) {
-        return bodyError(parsedBody);
+        return bodyError(parsedBody, request);
       }
       const body = parsedBody.value as {
         markdown?: string;
@@ -333,7 +376,7 @@ export async function handleOppRequest(request: Request): Promise<Response> {
         typeof body.markdown !== "string" ||
         !body.receipt
       ) {
-        return errorResponse(
+        return fail(
           400,
           "markdown_and_receipt_required",
           "Body fields `markdown` and `receipt` are required",
@@ -341,12 +384,12 @@ export async function handleOppRequest(request: Request): Promise<Response> {
       }
       const rows = parseOpenProgramMarkdown(body.markdown);
       const result = verifyShipReceipt(rows, body.receipt);
-      return jsonResponse(result.ok ? 200 : 422, { result });
+      return ok(result.ok ? 200 : 422, { result });
     }
 
-    return errorResponse(404, "not_found", `No route for ${method} ${path}`);
+    return fail(404, "not_found", `No route for ${method} ${path}`);
   } catch (err) {
-    return errorResponse(
+    return fail(
       500,
       "internal_error",
       err instanceof Error ? err.message : "Unexpected server error",

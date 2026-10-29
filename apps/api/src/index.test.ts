@@ -58,6 +58,39 @@ describe("@opp/api", () => {
     assert.equal(normalizeApiPath("/health"), "/health");
   });
 
+  it("allows CORS for landing + localhost origins (A-040)", async () => {
+    await withServer(async (port) => {
+      const base = `http://127.0.0.1:${port}`;
+      const allowed = await fetch(`${base}/health`, {
+        headers: { origin: "https://opp.coppergate.ai" },
+      });
+      assert.equal(allowed.status, 200);
+      assert.equal(
+        allowed.headers.get("access-control-allow-origin"),
+        "https://opp.coppergate.ai",
+      );
+
+      const denied = await fetch(`${base}/health`, {
+        headers: { origin: "https://evil.example" },
+      });
+      assert.equal(denied.status, 200);
+      assert.equal(denied.headers.get("access-control-allow-origin"), null);
+
+      const preflight = await fetch(`${base}/v1/spend/evaluate`, {
+        method: "OPTIONS",
+        headers: {
+          origin: "http://localhost:4173",
+          "access-control-request-method": "POST",
+        },
+      });
+      assert.equal(preflight.status, 204);
+      assert.equal(
+        preflight.headers.get("access-control-allow-origin"),
+        "http://localhost:4173",
+      );
+    });
+  });
+
   it("rejects oversized or non-JSON POST bodies (A-030)", async () => {
     await withServer(async (port) => {
       const base = `http://127.0.0.1:${port}`;

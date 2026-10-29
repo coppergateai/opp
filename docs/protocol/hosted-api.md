@@ -42,6 +42,14 @@ Optional `details` may carry structured context. `error` is the stable machine c
 | POST without `Content-Type: application/json` | 415 | `unsupported_media_type` |
 | Body larger than **256 KiB** | 413 | `payload_too_large` |
 
+### CORS (A-040)
+
+Browser calls from an `Origin` on the allowlist get `Access-Control-Allow-Origin` (echoed origin) + `Vary: Origin`. Others get no ACAO (server-to-server / curl unchanged).
+
+Allowed: `https://opp.coppergate.ai`, `http://localhost:{3000,4173,5173}`, `http://127.0.0.1:{3000,4173,5173}`.
+
+`OPTIONS` preflight returns **204** with the same allowlist rules.
+
 ## Live smoke (P-050)
 
 ```bash

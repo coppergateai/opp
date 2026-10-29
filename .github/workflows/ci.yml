@@ -50,3 +50,6 @@ jobs:
 
       - name: Open Program assert
         run: pnpm assert:open-program
+
+      - name: Ship receipts for Done IDs (AG-020)
+        run: pnpm assert:ship-receipts
