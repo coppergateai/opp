@@ -8,3 +8,5 @@ dist
 .DS_Store
 coverage
 apps/web/public/index.html
+.vercel
+.env*
