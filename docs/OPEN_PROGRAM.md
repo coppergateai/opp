@@ -12,6 +12,17 @@ ARCHITECTURE_REPO=coppergateai/opp
 ARCHITECTURE_PATHS=docs/OPEN_PROGRAM.md
 ```
 
+## Phase 3 — Close factory loop (spend next — RT-020)
+
+Wire Coppergate Accept into live OPP verify, then portable DX/hardening. Community **$0** only.
+
+| Status | ID | Title | Notes |
+| --- | --- | --- | --- |
+| Open | RT-020 | Coppergate Accept → OPP verify | After `persistShipReceipt`, project + `OppClient.verifyReceipt` when `OPP_API_URL` set; audit only; never block Accept |
+| Open | P-070 | `@opp/schema` README | Parity with P-060 package DX |
+| Open | A-040 | Community API CORS | Allow `https://opp.coppergate.ai` (+ localhost) on hosted API |
+| Open | AG-020 | CI assert Done IDs have ship-receipts | `docs/ship-receipts/{ID}.md` honesty |
+
 ## Phase 2 — Harden & live dogfood (complete)
 
 Keep the Community API honest under light abuse and prove it from CI. Community **$0** only.

@@ -4,7 +4,7 @@
 
 **Product:** OPP (Open Program Protocol)  
 **Category:** Portable program contract + Ship Receipt verification  
-**Status:** Phase 2 complete — P-050 / A-030 / P-060 / RT-010 Done (D16); factory Accept wire-up is follow-up  
+**Status:** Phase 3 in progress — RT-020 / P-070 / A-040 / AG-020 Open (D16)  
 **Pricing:** Community / self-host **$0** only — no paid SKU UI
 
 ## 1. Promise
