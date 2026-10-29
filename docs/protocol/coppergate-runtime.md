@@ -1,6 +1,8 @@
-# Coppergate as first OPP runtime (P-020)
+# Coppergate as first OPP runtime (P-020 / RT-010)
 
 Coppergate is the Open Program **selection runtime**. OPP is the portable **contract + verify** layer. This document locks the bind → spend → Accept → verify round-trip.
+
+**Operator runbook (RT-010):** [`accept-verify-runbook.md`](./accept-verify-runbook.md) — `OPP_API_URL`, projection, hosted verify, failure cheat sheet.
 
 ## Bind (Coppergate UI — P-105)
 
@@ -40,6 +42,9 @@ Optional live API:
 ```bash
 pnpm --filter @opp/api dev &
 OPP_API_URL=http://127.0.0.1:8790 pnpm prove:coppergate-runtime
+
+# or Community hosted (RT-010)
+OPP_API_URL=https://api.opp.coppergate.ai pnpm prove:coppergate-runtime
 ```
 
 The script:

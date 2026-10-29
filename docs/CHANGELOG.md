@@ -4,6 +4,7 @@
 
 ### Features
 
+- RT-010: Accept→OPP verify runbook (`OPP_API_URL`, projection, hosted verify).
 - P-060: Package READMEs for `@opp/client`, `@opp/parse`, `@opp/verify`.
 - P-050: CI smokes live Community API (`pnpm smoke:hosted-api`).
 - A-030: Hosted API rejects non-JSON POST (415) and bodies over 256 KiB (413).
