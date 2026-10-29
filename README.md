@@ -18,6 +18,7 @@ Second external Coppergate factory product ([D16](../coppergate-architecture/doc
 ```bash
 pnpm install
 pnpm test
+pnpm prove:coppergate-runtime
 pnpm --filter @opp/example-wedge-verify demo
 ```
 

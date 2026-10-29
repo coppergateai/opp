@@ -4,7 +4,7 @@
 
 **Product:** OPP (Open Program Protocol)  
 **Category:** Portable program contract + Ship Receipt verification  
-**Status:** Phase 0 — W-001 + P-010 Done (D16)  
+**Status:** Phase 0 — W-001 + P-010 + P-020 Done (D16)  
 **Pricing:** Community / self-host **$0** only — no paid SKU UI
 
 ## 1. Promise

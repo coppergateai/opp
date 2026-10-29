@@ -12,7 +12,8 @@
     "test": "turbo run test",
     "dev": "turbo run dev --parallel",
     "assert:open-program": "node scripts/assert-open-program.mjs",
-    "assert:lockfile": "node scripts/assert-lockfile.mjs"
+    "assert:lockfile": "node scripts/assert-lockfile.mjs",
+    "prove:coppergate-runtime": "pnpm --filter @opp/example-coppergate-runtime-prove prove"
   },
   "devDependencies": {
     "turbo": "^2.5.4",

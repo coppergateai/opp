@@ -2,6 +2,29 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { createApiServer } from "./index.js";
 
+/** Coppergate Accept → OPP verify body (P-020). */
+function coppergateProjectedReceipt(openId: string) {
+  return {
+    kind: "ship_receipt" as const,
+    protocolVersion: "0.1.0",
+    openId,
+    title: `${openId}: Coppergate runtime prove`,
+    spendMicros: 420_000,
+    fitnessScore: 1,
+    ci: {
+      acceptReady: true,
+      blocking: false,
+      passed: true,
+      checkCount: 3,
+    },
+    writeback: {
+      architectureId: openId,
+      note: `Open Program ${openId} → Done on Accept`,
+    },
+    acceptedAt: new Date().toISOString(),
+  };
+}
+
 async function withServer(fn: (port: number) => Promise<void>): Promise<void> {
   const server = createApiServer();
   await new Promise<void>((resolve) => {
@@ -24,6 +47,42 @@ const MD = `| Status | ID | Title | Notes |
 `;
 
 describe("@opp/api", () => {
+  it("Coppergate Accept receipt verifies over HTTP (P-020)", async () => {
+    await withServer(async (port) => {
+      const base = `http://127.0.0.1:${port}`;
+      const markdown = `| Status | ID | Title | Notes |
+| --- | --- | --- | --- |
+| Open | P-020 | Coppergate runtime prove | bind → verify |
+`;
+      const invent = await fetch(`${base}/v1/spend/evaluate`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ markdown, openId: null }),
+      });
+      assert.equal(invent.status, 403);
+
+      const spend = await fetch(`${base}/v1/spend/evaluate`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ markdown, openId: "P-020" }),
+      });
+      assert.equal(spend.status, 200);
+
+      const verify = await fetch(`${base}/v1/receipts/verify`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          markdown,
+          receipt: coppergateProjectedReceipt("P-020"),
+        }),
+      });
+      assert.equal(verify.status, 200);
+      const body = (await verify.json()) as { result: { ok: boolean; openId?: string } };
+      assert.equal(body.result.ok, true);
+      assert.equal(body.result.openId, "P-020");
+    });
+  });
+
   it("serves portable protocol schemas (P-010)", async () => {
     await withServer(async (port) => {
       const base = `http://127.0.0.1:${port}`;

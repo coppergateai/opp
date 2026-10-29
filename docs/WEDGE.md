@@ -18,4 +18,10 @@
 
 ## First runtime
 
-**Coppergate** — Open Program Runtime / Survivor selection. See [`coppergate/docs/OPP.md`](../../coppergate/docs/OPP.md).
+**Coppergate** — Open Program Runtime / Survivor selection. See [`protocol/coppergate-runtime.md`](./protocol/coppergate-runtime.md) and [`coppergate/docs/OPP.md`](../../coppergate/docs/OPP.md).
+
+Prove without a live Arena:
+
+```bash
+pnpm prove:coppergate-runtime
+```

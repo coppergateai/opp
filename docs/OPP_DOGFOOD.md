@@ -9,10 +9,11 @@ ARCHITECTURE_PATHS=docs/OPEN_PROGRAM.md
 
 Bind via Coppergate project Configuration → Open Program bind (P-105). Validate Open IDs before enabling maintainer spend.
 
-Wedge demo (no Coppergate required):
+Runtime adapter + prove (P-020): [`protocol/coppergate-runtime.md`](./protocol/coppergate-runtime.md)
 
 ```bash
 pnpm install
 pnpm test
+pnpm prove:coppergate-runtime
 pnpm --filter @opp/example-wedge-verify demo
 ```

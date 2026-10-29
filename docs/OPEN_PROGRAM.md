@@ -18,7 +18,7 @@ ARCHITECTURE_PATHS=docs/OPEN_PROGRAM.md
 | --- | --- | --- | --- |
 | Done | W-001 | Repo scaffold: pnpm monorepo, CI, LICENSE, README | schema + parse + verify + API + wedge demo |
 | Done | P-010 | JSON schema export for Open Program + Ship Receipt | machine-readable under `/v1/schemas` |
-| Open | P-020 | Coppergate runtime adapter docs + prove script | bind UI → OPP verify round-trip |
+| Done | P-020 | Coppergate runtime adapter docs + prove script | bind UI → OPP verify round-trip |
 | Open | A-010 | Hosted API polish + OpenAPI | pagination/errors; Community $0 |
 
 ## Explicitly not Open IDs

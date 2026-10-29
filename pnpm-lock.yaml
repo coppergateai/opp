@@ -55,6 +55,31 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
+  examples/coppergate-runtime-prove:
+    dependencies:
+      '@opp/parse':
+        specifier: workspace:*
+        version: link:../../packages/opp-parse
+      '@opp/schema':
+        specifier: workspace:*
+        version: link:../../packages/opp-schema
+      '@opp/verify':
+        specifier: workspace:*
+        version: link:../../packages/opp-verify
+    devDependencies:
+      '@opp/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+      '@types/node':
+        specifier: ^22.15.21
+        version: 22.20.5
+      tsx:
+        specifier: ^4.19.4
+        version: 4.23.15
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+
   examples/wedge-verify:
     dependencies:
       '@opp/parse':
