@@ -11,6 +11,7 @@ Second external Coppergate factory product ([D16](../coppergate-architecture/doc
 | `@opp/parse` | Markdown → program rows |
 | `@opp/verify` | Spend License + receipt verify |
 | `@opp/api` | HTTP parse / spend / verify |
+| `@opp/web` | Static landing ([opp.coppergate.ai](https://opp.coppergate.ai)) |
 
 ## Quickstart
 
@@ -18,6 +19,13 @@ Second external Coppergate factory product ([D16](../coppergate-architecture/doc
 pnpm install
 pnpm test
 pnpm --filter @opp/example-wedge-verify demo
+```
+
+Landing (local):
+
+```bash
+pnpm --filter @opp/web build
+pnpm --filter @opp/web dev
 ```
 
 ## Dogfood

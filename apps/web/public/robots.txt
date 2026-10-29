@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Host: opp.coppergate.ai
+Sitemap: https://opp.coppergate.ai/sitemap.xml
