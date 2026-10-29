@@ -1,6 +1,8 @@
-# `@opp/client` (P-030)
+# `@opp/client` (P-030 / P-060)
 
 First-party HTTP SDK for the hosted OPP API. Community / self-host **$0**.
+
+Package README: [`packages/opp-client/README.md`](../../packages/opp-client/README.md).
 
 ```ts
 import { OppClient } from "@opp/client";
