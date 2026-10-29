@@ -1,0 +1,83 @@
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+import { createApiServer } from "./index.js";
+
+async function withServer(fn: (port: number) => Promise<void>): Promise<void> {
+  const server = createApiServer();
+  await new Promise<void>((resolve) => {
+    server.listen(0, "127.0.0.1", () => resolve());
+  });
+  const addr = server.address();
+  assert.ok(addr && typeof addr === "object");
+  try {
+    await fn(addr.port);
+  } finally {
+    await new Promise<void>((resolve, reject) => {
+      server.close((err) => (err ? reject(err) : resolve()));
+    });
+  }
+}
+
+const MD = `| Status | ID | Title | Notes |
+| --- | --- | --- | --- |
+| Open | W-001 | Scaffold | first |
+`;
+
+describe("@opp/api", () => {
+  it("health + wedge parse/spend/verify", async () => {
+    await withServer(async (port) => {
+      const base = `http://127.0.0.1:${port}`;
+      const health = await fetch(`${base}/health`);
+      assert.equal(health.status, 200);
+
+      const parsed = await fetch(`${base}/v1/programs/parse`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ markdown: MD }),
+      });
+      assert.equal(parsed.status, 200);
+      const parsedBody = (await parsed.json()) as {
+        summary: { openCount: number };
+      };
+      assert.equal(parsedBody.summary.openCount, 1);
+
+      const invent = await fetch(`${base}/v1/spend/evaluate`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ markdown: MD, openId: null }),
+      });
+      assert.equal(invent.status, 403);
+
+      const spend = await fetch(`${base}/v1/spend/evaluate`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ markdown: MD, openId: "W-001" }),
+      });
+      assert.equal(spend.status, 200);
+
+      const verify = await fetch(`${base}/v1/receipts/verify`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          markdown: MD,
+          receipt: {
+            kind: "ship_receipt",
+            openId: "W-001",
+            title: "W-001: Scaffold",
+            spendMicros: 0,
+            fitnessScore: 1,
+            ci: {
+              acceptReady: true,
+              blocking: false,
+              passed: true,
+              checkCount: 1,
+            },
+            writeback: { architectureId: "W-001", note: "Done" },
+            acceptedAt: new Date().toISOString(),
+          },
+        }),
+      });
+      assert.equal(verify.status, 200);
+    });
+  });
+});
