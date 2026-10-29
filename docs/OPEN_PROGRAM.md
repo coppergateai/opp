@@ -19,7 +19,7 @@ Close the wedge for external runtimes: first-party client, hosted Community API,
 | Status | ID | Title | Notes |
 | --- | --- | --- | --- |
 | Done | P-030 | First-party `@opp/client` SDK | health, parse, spend, verify, schemas, openapi |
-| Open | A-020 | Host Community API (Vercel serverless) | `api.opp.coppergate.ai`; $0 |
+| Done | A-020 | Host Community API (Vercel serverless) | `api.opp.coppergate.ai`; $0 |
 | Open | AG-010 | CI runs coppergate-runtime prove | `pnpm prove:coppergate-runtime` in `check` |
 | Open | P-040 | Landing + docs link OpenAPI and `@opp/client` | DX surface on opp.coppergate.ai |
 

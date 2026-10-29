@@ -15,7 +15,7 @@ await client.evaluateSpend({ markdown, openId: null }); // invent → deny
 await client.verifyReceipt({ markdown, receipt });
 ```
 
-Default base URL: `http://127.0.0.1:8790`. Hosted URL lands with **A-020** (`api.opp.coppergate.ai`).
+Default base URL: `http://127.0.0.1:8790`. Hosted: `OPP_API_URL=https://api.opp.coppergate.ai` (A-020).
 
 Errors throw `OppClientError` with stable `code` / `status` matching `{ error, message }` from [hosted-api.md](./hosted-api.md).
 

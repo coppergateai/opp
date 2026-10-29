@@ -1,7 +1,7 @@
 /**
  * First-party HTTP client for the OPP hosted API (P-030).
  * Default base URL matches local `@opp/api` (`http://127.0.0.1:8790`).
- * Production: set `OPP_API_URL` (A-020 → api.opp.coppergate.ai).
+ * Production: `OPP_API_URL=https://api.opp.coppergate.ai` (A-020).
  */
 import type {
   OpenApiDocument,

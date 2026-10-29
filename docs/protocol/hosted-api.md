@@ -2,6 +2,9 @@
 
 Community / self-host **$0** only — no paid SKU.
 
+**Hosted:** `https://api.opp.coppergate.ai` (A-020)  
+**Local:** `http://127.0.0.1:8790` (`pnpm --filter @opp/api dev`)
+
 ## Machine-readable contract
 
 | Method | Path | Description |

@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { DOCUMENTED_HOSTED_PATHS, OPP_HOSTED_API_VERSION } from "@opp/schema";
-import { createApiServer } from "./index.js";
+import { createApiServer, normalizeApiPath } from "./index.js";
 
 /** Coppergate Accept → OPP verify body (P-020). */
 function coppergateProjectedReceipt(openId: string) {
@@ -48,6 +48,12 @@ const MD = `| Status | ID | Title | Notes |
 `;
 
 describe("@opp/api", () => {
+  it("normalizes Vercel /api rewrite paths (A-020)", () => {
+    assert.equal(normalizeApiPath("/api/health"), "/health");
+    assert.equal(normalizeApiPath("/api/v1/openapi.json"), "/v1/openapi.json");
+    assert.equal(normalizeApiPath("/health"), "/health");
+  });
+
   it("serves OpenAPI and polished errors/pagination (A-010)", async () => {
     await withServer(async (port) => {
       const base = `http://127.0.0.1:${port}`;

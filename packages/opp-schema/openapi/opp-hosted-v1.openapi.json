@@ -6,7 +6,14 @@
     "description": "HTTP API for Open Program Protocol: parse programs, evaluate Spend License, verify Ship Receipts. Portable protocol JSON Schemas live under `/v1/schemas`. Community / self-host $0 only — no paid SKU."
   },
   "servers": [
-    { "url": "http://127.0.0.1:8790", "description": "Local API (`pnpm --filter @opp/api dev`)" }
+    {
+      "url": "https://api.opp.coppergate.ai",
+      "description": "Community hosted API (A-020) — $0"
+    },
+    {
+      "url": "http://127.0.0.1:8790",
+      "description": "Local API (`pnpm --filter @opp/api dev`)"
+    }
   ],
   "tags": [
     { "name": "meta", "description": "Health and machine-readable docs" },
